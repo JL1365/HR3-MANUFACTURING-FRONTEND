@@ -7,6 +7,8 @@ import 'react-toastify/dist/ReactToastify.css';
 function BenefitsManagement() {
     const [allBenefits, setBenefits] = useState([]);
     const [isOpenModal, setIsOpenModal] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingItem, setEditingItem] = useState(null);
     const [formData, setFormData] = useState({
         benefitName: "",
         benefitDescription: "",
@@ -27,22 +29,22 @@ function BenefitsManagement() {
         }
     };
 
-    const handleCreate = async (e) => {
+    const handleCreateOrUpdate = async (e) => {
         e.preventDefault();
         try {
-            await axios.post("http://localhost:7687/api/benefit/create-benefit", formData);
-            toast.success("Benefit created successfully!");
-            setFormData({
-                benefitName: "",
-                benefitDescription: "",
-                benefitType: "Others",
-                isNeedRequest: false,
-            });
+            if (isEditing) {
+                await axios.put(`http://localhost:7687/api/benefit/update-benefit/${editingItem}`, formData);
+                toast.success("Benefit updated successfully!");
+            } else {
+                await axios.post("http://localhost:7687/api/benefit/create-benefit", formData);
+                toast.success("Benefit created successfully!");
+            }
+            resetForm();
             fetchBenefits();
             setIsOpenModal(false);
         } catch (error) {
-            console.error("Error creating benefit:", error.response ? error.response.data : error.message);
-            toast.error("Error creating benefit: " + (error.response ? error.response.data.message : error.message));
+            console.error("Error saving benefit:", error.response ? error.response.data : error.message);
+            toast.error("Error saving benefit: " + (error.response ? error.response.data.message : error.message));
         }
     };
 
@@ -54,13 +56,39 @@ function BenefitsManagement() {
         });
     };
 
+    const handleEdit = (benefit) => {
+        setEditingItem(benefit._id);
+        setFormData({
+            benefitName: benefit.benefitName,
+            benefitDescription: benefit.benefitDescription,
+            benefitType: benefit.benefitType,
+            isNeedRequest: benefit.isNeedRequest,
+        });
+        setIsEditing(true);
+        setIsOpenModal(true);
+    };
+
+    const resetForm = () => {
+        setFormData({
+            benefitName: "",
+            benefitDescription: "",
+            benefitType: "Others",
+            isNeedRequest: false,
+        });
+        setEditingItem(null);
+        setIsEditing(false);
+    };
+
     return (
         <div>
             <Header title="Benefits Management" />
             <ToastContainer />
             <button
                 className="mb-4 px-4 py-2 btn btn-primary text-white rounded"
-                onClick={() => setIsOpenModal(true)}
+                onClick={() => {
+                    resetForm();
+                    setIsOpenModal(true);
+                }}
             >
                 Create Benefit
             </button>
@@ -84,7 +112,9 @@ function BenefitsManagement() {
                                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">{benefit.benefitDescription}</td>
                                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">{benefit.benefitType}</td>
                                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">{benefit.isNeedRequest ? "Yes" : "No"}</td>
-                                    <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider"></td>
+                                    <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                                        <button className="btn btn-primary" onClick={() => handleEdit(benefit)}>Edit</button>
+                                    </td>
                                 </tr>
                             ))
                         ) : (
@@ -99,8 +129,8 @@ function BenefitsManagement() {
             {isOpenModal && (
                 <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50">
                     <div className="bg-white p-6 rounded shadow-lg">
-                        <h2 className="text-xl mb-4">Create Benefit</h2>
-                        <form onSubmit={handleCreate}>
+                        <h2 className="text-xl mb-4">{isEditing ? "Edit Benefit" : "Create Benefit"}</h2>
+                        <form onSubmit={handleCreateOrUpdate}>
                             <div>
                                 <label>Benefit Name</label>
                                 <input
@@ -151,13 +181,12 @@ function BenefitsManagement() {
                                     />
                                 </label>
                             </div>
-                            <button type="submit" className="mt-4 px-4 py-2 bg-green-500 text-white rounded">Create</button>
+                            <button type="submit" className="mt-4 px-4 py-2 bg-green-500 text-white rounded">{isEditing ? "Update" : "Create"}</button>
                             <button type="button" onClick={() => setIsOpenModal(false)} className="mt-4 px-4 py-2 bg-red-500 text-white rounded">Cancel</button>
                         </form>
                     </div>
                 </div>
             )}
-
         </div>
     );
 }

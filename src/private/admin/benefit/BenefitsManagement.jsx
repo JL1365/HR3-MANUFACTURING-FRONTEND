@@ -15,6 +15,9 @@ function BenefitsManagement() {
         benefitType: "Others",
         isNeedRequest: false,
     });
+    
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     useEffect(() => {
         fetchBenefits();
@@ -83,12 +86,23 @@ function BenefitsManagement() {
         if (!window.confirm("Are you sure you want to delete this item?")) return;
         toast.success("Item deleted successfully!");
         try {
-          await axios.delete(`http://localhost:7687/api/benefit/delete-benefit/${id}`);
-          setBenefits(allBenefits.filter((allBenefit) => allBenefit._id !== id));
+            await axios.delete(`http://localhost:7687/api/benefit/delete-benefit/${id}`);
+            setBenefits(allBenefits.filter((allBenefit) => allBenefit._id !== id));
         } catch (error) {
-          toast.error("Failed to delete item");
+            toast.error("Failed to delete item");
         }
-      };
+    };
+
+    // Pagination logic
+    const indexOfLastBenefit = currentPage * itemsPerPage;
+    const indexOfFirstBenefit = indexOfLastBenefit - itemsPerPage;
+    const currentBenefits = allBenefits.slice(indexOfFirstBenefit, indexOfLastBenefit);
+    const totalPages = Math.ceil(allBenefits.length / itemsPerPage);
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
     return (
         <div>
             <Header title="Benefits Management" />
@@ -115,15 +129,15 @@ function BenefitsManagement() {
                         </tr>
                     </thead>
                     <tbody>
-                        {allBenefits.length > 0 ? (
-                            allBenefits.map((benefit) => (
+                        {currentBenefits.length > 0 ? (
+                            currentBenefits.map((benefit) => (
                                 <tr key={benefit._id} className="hover:bg-gray-300 hover:text-white">
                                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">{benefit.benefitName}</td>
                                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">{benefit.benefitDescription}</td>
                                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">{benefit.benefitType}</td>
                                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">{benefit.isNeedRequest ? "Yes" : "No"}</td>
                                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                                        <button className="btn btn-primary" onClick={() => handleEdit(benefit)}>Edit</button>
+                                        <button className="btn btn-primary mr-2" onClick={() => handleEdit(benefit)}>Edit</button>
                                         <button className="btn btn-error" onClick={() => handleDelete(benefit._id)}>Delete</button>
                                     </td>
                                 </tr>
@@ -135,6 +149,19 @@ function BenefitsManagement() {
                         )}
                     </tbody>
                 </table>
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="flex justify-center mt-4">
+                {Array.from({ length: totalPages }, (_, index) => (
+                    <button
+                        key={index + 1}
+                        onClick={() => handlePageChange(index + 1)}
+                        className={`mx-1 px-3 py-1 border rounded ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-white text-black'}`}
+                    >
+                        {index + 1}
+                    </button>
+                ))}
             </div>
 
             {isOpenModal && (

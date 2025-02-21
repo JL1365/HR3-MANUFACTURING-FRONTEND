@@ -4,19 +4,18 @@ import axios from "axios";
 import SkeletonLoader from "./Skeleton";
 
 const ProtectedRoute = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    setTimeout(() => {
-    axios.get("http://localhost:7687/api/auth/check-auth", { withCredentials: true })
-      .then(() => setIsAuthenticated(true))
-      .catch(() => setIsAuthenticated(false));
-    }, 3000);
+    axios
+      .get("http://localhost:7687/api/auth/check-auth", { withCredentials: true })
+      .then((res) => setUser(res.data.user)) 
+      .catch(() => setUser(false));
   }, []);
 
-  if (isAuthenticated === null) return <SkeletonLoader />;
+  if (user === null) return <SkeletonLoader />;
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
+  return user ? <Outlet context={{ user }} /> : <Navigate to="/login" />;
 };
 
 export default ProtectedRoute;

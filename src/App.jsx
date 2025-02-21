@@ -5,9 +5,11 @@ import AdminSidebar from "./components/AdminSidebar";
 import EmployeeSidebar from "./components/EmployeeSidebar";
 
 import Login from "./public/Login";
-
 import AdminDashboard from "./private/admin/AdminDashboard";
 import EmployeeDashboard from "./private/employee/EmployeeDashboard";
+
+/* ADMIN SIDE */
+import BenefitsManagement from "./private/admin/benefit/BenefitsManagement";
 
 function App() {
   return (
@@ -17,20 +19,40 @@ function App() {
       </Route>
 
       <Route element={<ProtectedRoute />}>
-        <Route path="/dashboard" element={<DashboardWithSidebar />} />
+        <Route
+          path="/dashboard"
+          element={
+            <LayoutWithSidebar>
+              <DashboardContent />
+            </LayoutWithSidebar>
+          }
+        />
+        <Route
+          path="/benefits-management"
+          element={
+            <LayoutWithSidebar>
+              <BenefitsManagement />
+            </LayoutWithSidebar>
+          }
+        />
       </Route>
     </Routes>
   );
 }
 
-function DashboardWithSidebar() {
+function DashboardContent() {
+  const { user } = useOutletContext();
+  return user.role === "Admin" ? <AdminDashboard /> : <EmployeeDashboard />;
+}
+
+function LayoutWithSidebar({ children }) {
   const { user } = useOutletContext();
 
   return (
     <div className="flex">
       {user.role === "Admin" ? <AdminSidebar /> : <EmployeeSidebar />}
       <div className="flex-1 transition-all duration-300 p-6 bg-gray-100 min-h-screen">
-        {user.role === "Admin" ? <AdminDashboard /> : <EmployeeDashboard />}
+        {children}
       </div>
     </div>
   );

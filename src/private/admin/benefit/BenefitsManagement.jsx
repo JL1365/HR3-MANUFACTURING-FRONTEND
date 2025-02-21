@@ -79,6 +79,16 @@ function BenefitsManagement() {
         setIsEditing(false);
     };
 
+    const handleDelete = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this item?")) return;
+        toast.success("Item deleted successfully!");
+        try {
+          await axios.delete(`http://localhost:7687/api/benefit/delete-benefit/${id}`);
+          setBenefits(allBenefits.filter((allBenefit) => allBenefit._id !== id));
+        } catch (error) {
+          toast.error("Failed to delete item");
+        }
+      };
     return (
         <div>
             <Header title="Benefits Management" />
@@ -114,6 +124,7 @@ function BenefitsManagement() {
                                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">{benefit.isNeedRequest ? "Yes" : "No"}</td>
                                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
                                         <button className="btn btn-primary" onClick={() => handleEdit(benefit)}>Edit</button>
+                                        <button className="btn btn-error" onClick={() => handleDelete(benefit._id)}>Delete</button>
                                     </td>
                                 </tr>
                             ))

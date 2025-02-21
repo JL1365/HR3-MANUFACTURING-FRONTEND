@@ -11,6 +11,9 @@ import EmployeeDashboard from "./private/employee/EmployeeDashboard";
 /* ADMIN SIDE */
 import BenefitsManagement from "./private/admin/benefit/BenefitsManagement";
 
+/* EMPLOYEE SIDE */
+import BenefitOverview from "./private/employee/BenefitOverview";
+
 function App() {
   return (
     <Routes>
@@ -27,6 +30,7 @@ function App() {
             </LayoutWithSidebar>
           }
         />
+        {/* ADMIN SIDE */}
         <Route
           path="/benefits-management"
           element={
@@ -35,6 +39,16 @@ function App() {
             </LayoutWithSidebar>
           }
         />
+        {/* EMPLOYEE SIDE */}
+          <Route
+          path="/benefits-overview"
+          element={
+            <LayoutWithSidebar>
+              <BenefitOverview />
+            </LayoutWithSidebar>
+          }
+        />
+
       </Route>
     </Routes>
   );

@@ -58,9 +58,9 @@ function MyDeductions() {
 
       <div className="mt-6">
         <h2 className="text-xl font-semibold mb-4">My Benefit Deductions</h2>
-        <table className="w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
               <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Benefit Name</th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Total Amount</th>
             </tr>

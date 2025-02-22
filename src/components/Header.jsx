@@ -1,8 +1,33 @@
 import { Search, User, Bell } from "lucide-react";
 import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Header = ({ title }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const confirmLogout = window.confirm("Are you sure you want to log out?");
+    if (!confirmLogout) return;
+
+    try {
+      const response = await axios.post(
+        "http://localhost:7687/api/auth/logout",
+        {},
+        { withCredentials: true }
+      );
+
+      if (response.data.success) {
+        navigate("/login"); 
+      } else {
+        alert("Logout failed");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      alert("Error logging out. Please try again.");
+    }
+  };
 
   return (
     <header className="bg-white bg-opacity-50 backdrop-blur-md shadow-lg border border-black mb-10">
@@ -28,7 +53,7 @@ const Header = ({ title }) => {
           {/* Notification Icon */}
           <button className="relative flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 focus:outline-none">
             <Bell size={24} className="text-gray-600" />
-            {/* Notification Badge (if needed) */}
+            {/* Notification Badge */}
             <span className="absolute top-0 right-0 inline-block w-3 h-3 bg-red-500 rounded-full"></span>
           </button>
 
@@ -51,7 +76,10 @@ const Header = ({ title }) => {
                   <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                     Settings
                   </li>
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                  <li
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-600"
+                    onClick={handleLogout}
+                  >
                     Log Out
                   </li>
                 </ul>

@@ -33,7 +33,8 @@ function ApplyBenefit() {
         }
       );
       if (response.data.myApplyRequests) {
-        setMyApplyRequests(response.data.myApplyRequests);
+        const sortedMyApplyRequest = response.data.myApplyRequests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setMyApplyRequests(sortedMyApplyRequest);
       } else {
         toast.warn("No apply requests found.");
         setMyApplyRequests([]);
@@ -45,6 +46,11 @@ function ApplyBenefit() {
       );
     }
   };
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+  
 
   const fetchBenefits = async () => {
     try {
@@ -195,6 +201,9 @@ function ApplyBenefit() {
                 Upload Docs
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                Date
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
                 Action
               </th>
             </tr>
@@ -221,6 +230,10 @@ function ApplyBenefit() {
                       </a>
                     )}
                   </td>
+                  <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+  {formatDate(benefit.createdAt)}
+</td>
+
                   <td>
                     <button className="btn btn-primary mr-2" onClick={() => handleEdit(benefit)}>
                       Edit

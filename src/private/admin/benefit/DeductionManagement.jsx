@@ -15,7 +15,9 @@ function DeductionManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [isOpenModal, setisOpenModal] = useState(false);
-
+  const [editingDeduction, setEditingDeduction] = useState(null);
+  const [newAmount, setNewAmount] = useState("");
+  
   useEffect(() => {
     fetchAllAppliedRequests();
     fetchAllDeductions();
@@ -113,6 +115,38 @@ function DeductionManagement() {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const handleUpdateDeduction = async () => {
+    if (!editingDeduction || !newAmount || isNaN(newAmount)) {
+      toast.error("Please enter a valid amount.");
+      return;
+    }
+  
+    try {
+      const response = await axios.put(
+        `http://localhost:7687/api/benefitDeduction/update-user-deduction/${editingDeduction._id}`,
+        { amount: parseFloat(newAmount) },
+        { withCredentials: true }
+      );
+  
+      toast.success(response.data.message);
+  
+      setSelectedUserDeductions((prev) =>
+        prev.map((deduction) =>
+          deduction._id === editingDeduction._id
+            ? { ...deduction, amount: parseFloat(newAmount) }
+            : deduction
+        )
+      );
+  
+      setEditingDeduction(null);
+      setNewAmount("");
+      fetchAllDeductions();
+    } catch (error) {
+      toast.error("Error updating deduction.");
+    }
+  };
+  
 
   return (
     <div className="p-5">
@@ -233,53 +267,81 @@ function DeductionManagement() {
       </div>
 
       {/* Modal for showing deductions */}
-      {selectedUserDeductions && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-5 rounded w-1/2">
-            <h2 className="text-xl font-semibold mb-4">Deductions Details</h2>
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                    Benefit Name
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                    Amount
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                    Date
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {selectedUserDeductions.map((deduction) => (
-                  <tr
-                    key={deduction._id}
-                    className="hover:bg-gray-300 hover:text-white"
-                  >
-                    <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                      {deduction.BenefitRequestId?.benefitId?.benefitName ||
-                        "N/A"}
-                    </td>
-                    <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                      ₱{deduction.amount.toFixed(2)}
-                    </td>
-                    <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                      {new Date(deduction.createdAt).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <button
-              className="bg-red-500 text-white p-2 rounded mt-4"
-              onClick={() => setSelectedUserDeductions(null)}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+{selectedUserDeductions && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div className="bg-white p-5 rounded w-1/2">
+      <h2 className="text-xl font-semibold mb-4">Deductions Details</h2>
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-50">
+          <tr>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Benefit Name</th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Amount</th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Date</th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {selectedUserDeductions.map((deduction) => (
+            <tr key={deduction._id} className="hover:bg-gray-300 hover:text-white">
+              <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                {deduction.BenefitRequestId?.benefitId?.benefitName || "N/A"}
+              </td>
+              <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                ₱{deduction.amount.toFixed(2)}
+              </td>
+              <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                {new Date(deduction.createdAt).toLocaleDateString()}
+              </td>
+              <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                <button
+                  className="bg-blue-500 text-white p-2 rounded"
+                  onClick={() => setEditingDeduction(deduction)}
+                >
+                  Edit
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <button
+        className="bg-red-500 text-white p-2 rounded mt-4"
+        onClick={() => setSelectedUserDeductions(null)}
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
+
+{editingDeduction && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div className="bg-white p-5 rounded w-1/3">
+      <h2 className="text-xl font-semibold mb-4">Update Deduction</h2>
+      <input
+        type="number"
+        className="w-full p-2 border border-gray-300 rounded mb-4"
+        value={newAmount}
+        onChange={(e) => setNewAmount(e.target.value)}
+      />
+      <div className="flex justify-end">
+        <button
+          className="bg-green-500 text-white p-2 rounded mr-2"
+          onClick={handleUpdateDeduction}
+        >
+          Update
+        </button>
+        <button
+          className="bg-gray-500 text-white p-2 rounded"
+          onClick={() => setEditingDeduction(null)}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

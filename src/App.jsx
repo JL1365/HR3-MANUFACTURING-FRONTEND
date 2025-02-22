@@ -14,6 +14,7 @@ import BenefitsManagement from "./private/admin/benefit/BenefitsManagement";
 /* EMPLOYEE SIDE */
 import BenefitOverview from "./private/employee/BenefitOverview";
 import ApplyBenefit from "./private/employee/ApplyBenefitRequest";
+import BenefitRequested from "./private/admin/benefit/BenefitRequested";
 
 function App() {
   return (
@@ -40,6 +41,15 @@ function App() {
             </LayoutWithSidebar>
           }
         />
+          <Route
+          path="/applied-request"
+          element={
+            <LayoutWithSidebar>
+              <BenefitRequested />
+            </LayoutWithSidebar>
+          }
+        />
+
         {/* EMPLOYEE SIDE */}
           <Route
           path="/benefits-overview"

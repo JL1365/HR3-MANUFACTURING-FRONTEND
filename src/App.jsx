@@ -13,6 +13,8 @@ import BenefitsManagement from "./private/admin/benefit/BenefitsManagement";
 import BenefitRequested from "./private/admin/benefit/BenefitRequested";
 import DeductionManagement from "./private/admin/benefit/DeductionManagement";
 
+import IncentivesManagement from "./private/admin/benefit/IncentivesManagement";
+
 /* EMPLOYEE SIDE */
 import BenefitOverview from "./private/employee/BenefitOverview";
 import ApplyBenefit from "./private/employee/ApplyBenefitRequest";
@@ -59,7 +61,15 @@ function App() {
             </LayoutWithSidebar>
           }
         />
-
+        {/* Incentives */}
+        <Route
+          path="/incentives-management"
+          element={
+            <LayoutWithSidebar>
+              <IncentivesManagement />
+            </LayoutWithSidebar>
+          }
+        />
         {/* EMPLOYEE SIDE */}
           <Route
           path="/benefits-overview"

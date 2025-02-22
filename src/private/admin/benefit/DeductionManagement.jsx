@@ -17,6 +17,8 @@ function DeductionManagement() {
   const [isOpenModal, setisOpenModal] = useState(false);
   const [editingDeduction, setEditingDeduction] = useState(null);
   const [newAmount, setNewAmount] = useState("");
+  const [modalPage, setModalPage] = useState(1);
+  const modalItemsPerPage = 5;
   
   useEffect(() => {
     fetchAllAppliedRequests();
@@ -224,7 +226,7 @@ function DeductionManagement() {
       {/* Deductions Table */}
       <div className="mt-6">
         <h2 className="text-xl font-semibold mb-4">Benefit Deductions</h2>
-        <table className="w-full border-collapse border border-gray-300">
+        <table className="min-w-full divide-y divide-gray-200">
           <thead>
             <tr className="bg-gray-100">
               <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
@@ -267,52 +269,92 @@ function DeductionManagement() {
       </div>
 
       {/* Modal for showing deductions */}
-{selectedUserDeductions && (
+      {selectedUserDeductions && (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
     <div className="bg-white p-5 rounded w-1/2">
       <h2 className="text-xl font-semibold mb-4">Deductions Details</h2>
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Benefit Name</th>
-            <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Amount</th>
-            <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Date</th>
-            <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {selectedUserDeductions.map((deduction) => (
-            <tr key={deduction._id} className="hover:bg-gray-300 hover:text-white">
-              <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                {deduction.BenefitRequestId?.benefitId?.benefitName || "N/A"}
-              </td>
-              <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                ₱{deduction.amount.toFixed(2)}
-              </td>
-              <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                {new Date(deduction.createdAt).toLocaleDateString()}
-              </td>
-              <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                <button
-                  className="bg-blue-500 text-white p-2 rounded"
-                  onClick={() => setEditingDeduction(deduction)}
-                >
-                  Edit
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+
+      {/* Modal Pagination Logic */}
+      {(() => {
+        const modalTotalPages = Math.ceil(selectedUserDeductions.length / modalItemsPerPage);
+        const paginatedModalDeductions = selectedUserDeductions.slice(
+          (modalPage - 1) * modalItemsPerPage,
+          modalPage * modalItemsPerPage
+        );
+
+        return (
+          <>
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Benefit Name</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Amount</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Date</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedModalDeductions.map((deduction) => (
+                  <tr key={deduction._id} className="hover:bg-gray-300 hover:text-white">
+                    <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                      {deduction.BenefitRequestId?.benefitId?.benefitName || "N/A"}
+                    </td>
+                    <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                      ₱{deduction.amount.toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                      {new Date(deduction.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                      <button
+                        className="bg-blue-500 text-white p-2 rounded"
+                        onClick={() => setEditingDeduction(deduction)}
+                      >
+                        Edit
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* Pagination Controls */}
+            <div className="flex justify-center mt-4">
+              <button
+                disabled={modalPage === 1}
+                onClick={() => setModalPage(modalPage - 1)}
+                className="px-4 py-2 mx-1 bg-gray-300 rounded"
+              >
+                Previous
+              </button>
+              <span className="px-4 py-2">
+                Page {modalPage} of {modalTotalPages}
+              </span>
+              <button
+                disabled={modalPage === modalTotalPages}
+                onClick={() => setModalPage(modalPage + 1)}
+                className="px-4 py-2 mx-1 bg-gray-300 rounded"
+              >
+                Next
+              </button>
+            </div>
+          </>
+        );
+      })()}
+
       <button
         className="bg-red-500 text-white p-2 rounded mt-4"
-        onClick={() => setSelectedUserDeductions(null)}
+        onClick={() => {
+          setSelectedUserDeductions(null);
+          setModalPage(1);
+        }}
       >
         Close
       </button>
     </div>
   </div>
 )}
+
 
 {editingDeduction && (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">

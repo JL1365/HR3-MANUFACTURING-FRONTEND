@@ -16,6 +16,7 @@ import DeductionManagement from "./private/admin/benefit/DeductionManagement";
 /* EMPLOYEE SIDE */
 import BenefitOverview from "./private/employee/BenefitOverview";
 import ApplyBenefit from "./private/employee/ApplyBenefitRequest";
+import MyDeductions from "./private/employee/MyDeductions";
 
 function App() {
   return (
@@ -73,6 +74,14 @@ function App() {
           element={
             <LayoutWithSidebar>
               <ApplyBenefit />
+            </LayoutWithSidebar>
+          }
+        />
+          <Route
+          path="/my-deductions"
+          element={
+            <LayoutWithSidebar>
+              <MyDeductions />
             </LayoutWithSidebar>
           }
         />

@@ -10,11 +10,12 @@ import EmployeeDashboard from "./private/employee/EmployeeDashboard";
 
 /* ADMIN SIDE */
 import BenefitsManagement from "./private/admin/benefit/BenefitsManagement";
+import BenefitRequested from "./private/admin/benefit/BenefitRequested";
+import DeductionManagement from "./private/admin/benefit/DeductionManagement";
 
 /* EMPLOYEE SIDE */
 import BenefitOverview from "./private/employee/BenefitOverview";
 import ApplyBenefit from "./private/employee/ApplyBenefitRequest";
-import BenefitRequested from "./private/admin/benefit/BenefitRequested";
 
 function App() {
   return (
@@ -46,6 +47,14 @@ function App() {
           element={
             <LayoutWithSidebar>
               <BenefitRequested />
+            </LayoutWithSidebar>
+          }
+        />
+          <Route
+          path="/deduction-management"
+          element={
+            <LayoutWithSidebar>
+              <DeductionManagement />
             </LayoutWithSidebar>
           }
         />

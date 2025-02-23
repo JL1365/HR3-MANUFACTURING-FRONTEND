@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Header from "../../components/Header";
+import Header from "../../../components/Header";
 
 function ApplyBenefit() {
   const [myApplyRequests, setMyApplyRequests] = useState([]);

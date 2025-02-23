@@ -40,10 +40,10 @@ const AdminSidebar = () => {
       href: "/incentives-management",
       icon: GiftIcon,
       subItems: [
-        { name: "Incentive Request", href: "/incentive-request" },
         { name: "Sales commission", href: "/sales-commission"},
         { name: "Assigned sales commission", href: "/assigned-sales-commission"},
         { name: "Added sales commission", href: "/added-sales-commission"},
+        { name: "Incentive Tracking", href: "/incentive-tracking"},
         { name: "Recognition Programs", href: "/recognition-programs"},
       ],
     },

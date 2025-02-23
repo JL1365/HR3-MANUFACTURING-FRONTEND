@@ -5,6 +5,7 @@ import AdminSidebar from "./components/AdminSidebar";
 import EmployeeSidebar from "./components/EmployeeSidebar";
 
 import Login from "./public/Login";
+import NotFound from "./components/NotFound";
 import AdminDashboard from "./private/admin/AdminDashboard";
 import EmployeeDashboard from "./private/employee/EmployeeDashboard";
 
@@ -16,16 +17,19 @@ import DeductionManagement from "./private/admin/benefit/DeductionManagement";
 import IncentivesManagement from "./private/admin/benefit/IncentivesManagement";
 
 /* EMPLOYEE SIDE */
-import BenefitOverview from "./private/employee/BenefitOverview";
-import ApplyBenefit from "./private/employee/ApplyBenefitRequest";
-import MyDeductions from "./private/employee/MyDeductions";
-import IncentivesOverview from "./private/employee/IncentivesOverview";
+import BenefitOverview from "./private/employee/eBenefit/BenefitOverview";
+import ApplyBenefit from "./private/employee/eBenefit/ApplyBenefitRequest";
+import MyDeductions from "./private/employee/eBenefit/MyDeductions";
+import IncentivesOverview from "./private/employee/eIncentive/IncentivesOverview";
+
+import IncentiveTracking from "./private/admin/incentive/IncentiveTracking";
 
 function App() {
   return (
     <Routes>
       <Route element={<PublicRoute />}>
         <Route path="/login" element={<Login />} />
+        <Route  path="*" element={<NotFound/>}/>
       </Route>
 
       <Route element={<ProtectedRoute />}>
@@ -68,6 +72,14 @@ function App() {
           element={
             <LayoutWithSidebar>
               <IncentivesManagement />
+            </LayoutWithSidebar>
+          }
+        />
+        <Route
+          path="/incentive-tracking"
+          element={
+            <LayoutWithSidebar>
+              <IncentiveTracking />
             </LayoutWithSidebar>
           }
         />

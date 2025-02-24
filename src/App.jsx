@@ -15,14 +15,15 @@ import BenefitRequested from "./private/admin/benefit/BenefitRequested";
 import DeductionManagement from "./private/admin/benefit/DeductionManagement";
 
 import IncentivesManagement from "./private/admin/benefit/IncentivesManagement";
+import IncentiveTracking from "./private/admin/incentive/IncentiveTracking";
 
 /* EMPLOYEE SIDE */
 import BenefitOverview from "./private/employee/eBenefit/BenefitOverview";
 import ApplyBenefit from "./private/employee/eBenefit/ApplyBenefitRequest";
 import MyDeductions from "./private/employee/eBenefit/MyDeductions";
-import IncentivesOverview from "./private/employee/eIncentive/IncentivesOverview";
 
-import IncentiveTracking from "./private/admin/incentive/IncentiveTracking";
+import IncentivesOverview from "./private/employee/eIncentive/IncentivesOverview";
+import MyIncentivesTracking from "./private/employee/eIncentive/MyIncentiveTracking";
 
 function App() {
   return (
@@ -117,7 +118,17 @@ function App() {
             </LayoutWithSidebar>
           }
         />
+
+        <Route
+          path="/my-incentives-tracking"
+          element={
+            <LayoutWithSidebar>
+              <MyIncentivesTracking />
+            </LayoutWithSidebar>
+          }
+        />
       </Route>
+
     </Routes>
   );
 }

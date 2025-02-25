@@ -19,7 +19,7 @@ const Header = ({ title }) => {
       );
 
       if (response.data.success) {
-        navigate("/login"); 
+        navigate("/"); 
       } else {
         alert("Logout failed");
       }

@@ -3,7 +3,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import axios from "axios";
 import SkeletonLoader from "./Skeleton";
 
-const ProtectedRoute = () => {
+const ProtectedRoute = ({ allowedHr }) => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -15,7 +15,11 @@ const ProtectedRoute = () => {
 
   if (user === null) return <SkeletonLoader />;
 
-  return user ? <Outlet context={{ user }} /> : <Navigate to="/" />;
+  return user && allowedHr.includes(user.Hr) ? (
+    <Outlet context={{ user }} />
+  ) : (
+    <Navigate to="/" />
+  );
 };
 
 export default ProtectedRoute;

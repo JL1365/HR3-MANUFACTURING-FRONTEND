@@ -25,16 +25,17 @@ import MyDeductions from "./private/employee/eBenefit/MyDeductions";
 
 import IncentivesOverview from "./private/employee/eIncentive/IncentivesOverview";
 import MyIncentivesTracking from "./private/employee/eIncentive/MyIncentiveTracking";
+import Profile from "./components/Profile";
 
 function App() {
   return (
     <Routes>
       <Route element={<PublicRoute />}>
         <Route path="/" element={<Login />} />
-        <Route  path="*" element={<NotFound/>}/>
+        {/* <Route  path="*" element={<NotFound/>}/> */}
       </Route>
 
-      <Route element={<ProtectedRoute />}>
+      <Route element={<ProtectedRoute allowedHr={[3]} />}>
         <Route
           path="/dashboard"
           element={
@@ -44,6 +45,14 @@ function App() {
           }
         />
         {/* ADMIN SIDE */}
+        <Route
+        path="/profile"
+        element={
+          <LayoutWithSidebar>
+            <Profile />
+          </LayoutWithSidebar>
+        }
+      />
         <Route
           path="/benefits-management"
           element={
@@ -95,6 +104,14 @@ function App() {
           }
         />
         {/* EMPLOYEE SIDE */}
+        <Route
+        path="/profile"
+        element={
+          <LayoutWithSidebar>
+            <Profile />
+          </LayoutWithSidebar>
+        }
+      />
           <Route
           path="/benefits-overview"
           element={

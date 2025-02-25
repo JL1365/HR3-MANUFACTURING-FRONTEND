@@ -9,7 +9,7 @@ function NotFound() {
         <div className="mt-6">
           <button
             className="btn btn-primary"
-            onClick={() => window.location.href = '/login'}
+            onClick={() => window.location.href = '/'}
           >
             Go Back Home
           </button>

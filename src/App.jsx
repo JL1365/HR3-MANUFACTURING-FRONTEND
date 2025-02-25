@@ -14,8 +14,9 @@ import BenefitsManagement from "./private/admin/benefit/BenefitsManagement";
 import BenefitRequested from "./private/admin/benefit/BenefitRequested";
 import DeductionManagement from "./private/admin/benefit/DeductionManagement";
 
-import IncentivesManagement from "./private/admin/benefit/IncentivesManagement";
+import IncentivesManagement from "./private/admin/incentive/IncentivesManagement";
 import IncentiveTracking from "./private/admin/incentive/IncentiveTracking";
+import SalesCommission from "./private/admin/incentive/SalesCommission";
 
 /* EMPLOYEE SIDE */
 import BenefitOverview from "./private/employee/eBenefit/BenefitOverview";
@@ -29,7 +30,7 @@ function App() {
   return (
     <Routes>
       <Route element={<PublicRoute />}>
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Login />} />
         <Route  path="*" element={<NotFound/>}/>
       </Route>
 
@@ -81,6 +82,15 @@ function App() {
           element={
             <LayoutWithSidebar>
               <IncentiveTracking />
+            </LayoutWithSidebar>
+          }
+        />
+
+          <Route
+          path="/sales-commission"
+          element={
+            <LayoutWithSidebar>
+              <SalesCommission />
             </LayoutWithSidebar>
           }
         />

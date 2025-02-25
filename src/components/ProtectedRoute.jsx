@@ -15,7 +15,7 @@ const ProtectedRoute = () => {
 
   if (user === null) return <SkeletonLoader />;
 
-  return user ? <Outlet context={{ user }} /> : <Navigate to="/login" />;
+  return user ? <Outlet context={{ user }} /> : <Navigate to="/" />;
 };
 
 export default ProtectedRoute;

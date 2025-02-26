@@ -26,6 +26,7 @@ import MyDeductions from "./private/employee/eBenefit/MyDeductions";
 import IncentivesOverview from "./private/employee/eIncentive/IncentivesOverview";
 import MyIncentivesTracking from "./private/employee/eIncentive/MyIncentiveTracking";
 import Profile from "./components/Profile";
+import MySalesCommission from "./private/employee/eIncentive/MySalesCommission";
 
 function App() {
   return (
@@ -151,6 +152,15 @@ function App() {
           element={
             <LayoutWithSidebar>
               <MyIncentivesTracking />
+            </LayoutWithSidebar>
+          }
+        />
+
+        <Route
+          path="/my-sales-commission"
+          element={
+            <LayoutWithSidebar>
+              <MySalesCommission />
             </LayoutWithSidebar>
           }
         />

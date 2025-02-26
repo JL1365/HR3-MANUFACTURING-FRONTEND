@@ -29,7 +29,7 @@ function MyDeductions() {
         toast.warn("No deductions found.");
       }
     } catch (error) {
-      toast.error("Error fetching deductions.");
+      console.log("Error fetching deductions.");
     }
   };
 

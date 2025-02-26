@@ -43,7 +43,6 @@ function IncentivesOverview() {
                             <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Incentive Name</th>
                             <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Incentive Description</th>
                             <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Incentive Type</th>
-                            <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -53,10 +52,6 @@ function IncentivesOverview() {
                                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">{incentive.incentiveName}</td>
                                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">{incentive.incentiveDescription}</td>
                                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">{incentive.incentiveType}</td>
-                                    <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                                        <button className="btn btn-primary mr-2" onClick={() => handleEdit(incentive)}>Edit</button>
-                                        <button className="btn btn-error" onClick={() => handleDelete(incentive._id)}>Delete</button>
-                                    </td>
                                 </tr>
                             ))
                         ) : (

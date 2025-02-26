@@ -2,6 +2,7 @@ import React, { use, useEffect, useState } from "react";
 import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "../../../components/Header";
+import StandardCompensationOverview from "./StandardCompensationOverview";
 
 function CompensationOverview() {
   const [compensationPlans, setCompensationPlans] = useState([]);
@@ -151,7 +152,7 @@ function CompensationOverview() {
           </button>
         ))}
       </div>
-
+        <StandardCompensationOverview />
     </div>
   );
 }

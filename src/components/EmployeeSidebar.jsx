@@ -40,7 +40,6 @@ const EmployeeSidebar = () => {
       href: "/incentives-overview",
       icon: GiftIcon,
       subItems: [
-        { name: "Available commissions", href: "/sales-commission" },
         { name: "My sales", href: "/my-sales-commission" },
         { name: "My tracking", href: "/my-incentives-tracking" },
         { name: "Recognition", href: "/recognition-programs" },

@@ -50,7 +50,6 @@ const AdminSidebar = () => {
       href: "/compensation-planning",
       icon: Briefcase,
       subItems: [
-        { name: "Salary Planning", href: "/salary-planning" },
         { name: "Grievance Request", href: "/grievance-request"},
       ],
     },

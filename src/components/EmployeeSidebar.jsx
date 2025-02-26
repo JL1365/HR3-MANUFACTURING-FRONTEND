@@ -46,6 +46,14 @@ const EmployeeSidebar = () => {
       ],
     },
     {
+      name: "Compensation Overview",
+      href: "/compensation-overview",
+      icon: DollarSign,
+      subItems: [
+        { name: "Salary Structure", href: "/my-salary-structure" },
+      ],
+    },
+    {
       name: "Payroll Overview",
       href: "/payroll-overview",
       icon: DollarSign,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import axios from "axios";
 import Header from "../../../components/Header";
 import { ToastContainer, toast } from "react-toastify";
@@ -7,6 +7,7 @@ import StandardCompensationPlanning from "./StandardCompensationPlanning";
 
 function CompensationPlanning() {
   const [compensationPlans, setCompensationPlans] = useState([]);
+  const [users,setUsers] = useState()
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -23,6 +24,7 @@ function CompensationPlanning() {
 
   useEffect(() => {
     fetchCompensationplans();
+    fetchUsers();
   }, []);
 
   const fetchCompensationplans = async () => {
@@ -47,7 +49,14 @@ function CompensationPlanning() {
       );
     }
   };
-
+  const fetchUsers = async () => {
+    try {
+        const response = await axios.get("http://localhost:7687/api/auth/get-all-users");
+        setUsers(response.data.users || []);
+    } catch (error) {
+        console.error("Error fetching users:", error);
+    }
+};
   const handleCreateOrUpdate = async (e) => {
     e.preventDefault();
     try {
@@ -96,17 +105,18 @@ function CompensationPlanning() {
   };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     });
   };
+  
 
   const handleEdit = (compensation) => {
     setEditingItem(compensation._id);
     setFormData({
-      position: compensation.position,
+      position: compensation.position.position,
       hourlyRate: compensation.hourlyRate,
       overTimeRate: compensation.overTimeRate,
       holidayRate: compensation.holidayRate,
@@ -115,7 +125,7 @@ function CompensationPlanning() {
     setIsEditing(true);
     setIsOpenModal(true);
   };
-
+  
   const resetForm = () => {
     setFormData({
       position: "",
@@ -215,7 +225,7 @@ function CompensationPlanning() {
                   className="hover:bg-gray-300 hover:text-white"
                 >
                   <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                    {compensation.position}
+                    {compensation.position?.position}
                   </td>
                   <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
                     {compensation.hourlyRate}
@@ -294,17 +304,23 @@ function CompensationPlanning() {
                 : "Create Compensation Plan"}
             </h2>
             <form onSubmit={handleCreateOrUpdate}>
-              <div>
-                <label>Position</label>
-                <input
-                  type="text"
-                  name="position"
-                  value={formData.position}
-                  onChange={handleChange}
-                  required
-                  className="border p-2 w-full"
-                />
-              </div>
+            <div>
+          <label>Position</label>
+          <select
+            name="position"
+            value={formData.position}
+            onChange={handleChange}
+            className="border p-2 w-full"
+          >
+            <option value="">Select Position</option>
+            {users &&
+              users.map((user) => (
+                <option key={user._id} value={user.position}>
+                  {user.position}
+                </option>
+              ))}
+          </select>
+        </div>
               <div>
                 <label>Hourly Rate</label>
                 <input

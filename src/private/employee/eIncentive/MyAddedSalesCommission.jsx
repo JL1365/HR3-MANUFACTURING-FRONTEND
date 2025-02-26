@@ -70,18 +70,18 @@ function MyAddedSalesCommission() {
                                 <td className="px-6 py-4 text-gray-700">{sale.salesCommissionId?.commissionRate || 0}%</td>
                                 <td className="px-6 py-4 text-gray-700">{sale.salesAmount || 0}</td>
                                 <td className="px-6 py-4">
-    {sale.salesProof && sale.salesProof.length > 0 ? (
-        <a href={sale.salesProof[0].url} target="_blank" rel="noopener noreferrer">
-            <img 
-                src={sale.salesProof[0].url} 
-                alt="Sales Proof" 
-                className="w-16 h-16 object-cover rounded-md border border-gray-300 hover:opacity-80 cursor-pointer"
-            />
-        </a>
-    ) : (
-        "No Proof"
-    )}
-</td>
+                                {sale.salesProof && sale.salesProof.length > 0 ? (
+                                    <a href={sale.salesProof[0].url} target="_blank" rel="noopener noreferrer">
+                                        <img 
+                                            src={sale.salesProof[0].url} 
+                                            alt="Sales Proof" 
+                                            className="w-16 h-16 object-cover rounded-md border border-gray-300 hover:opacity-80 cursor-pointer"
+                                        />
+                                    </a>
+                                ) : (
+                                    "No Proof"
+                                )}
+                            </td>
 
 
                                 <td className="px-6 py-4 font-semibold">{sale.confirmationStatus}</td>

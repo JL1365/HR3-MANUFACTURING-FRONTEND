@@ -125,8 +125,8 @@ function MySalesCommission() {
                     </button>
                 ))}
             </div>
-            <MySalesCommissionStatus />
             <MyAddedSalesCommission />
+            <MySalesCommissionStatus />
         </div>
     );
 }

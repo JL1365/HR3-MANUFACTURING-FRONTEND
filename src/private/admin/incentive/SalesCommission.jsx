@@ -3,11 +3,16 @@ import axios from "axios";
 import Header from "../../../components/Header";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import EmployeeAddedSalesCommissions from "./EmployeeAddedSalesCommissions";
+import EmployeeSalesCommissionStatus from "./EmployeeSalesCommissionsStatus";
+import EmployeeSalesCommissionsStatus from "./EmployeeSalesCommissionsStatus";
 
 function SalesCommission() {
     const [allSalesCommissions, setSalesCommission] = useState([]);
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [isAssignedByModalOpen, setIsAssignedByModalOpen] = useState(false);
+    const [selectedAssignedBy, setSelectedAssignedBy] = useState([]);
     const [editingItem, setEditingItem] = useState(null);
     const [formData, setFormData] = useState({
         salesCommissionName: "",
@@ -104,6 +109,11 @@ function SalesCommission() {
         return new Date(dateString).toLocaleDateString(undefined, options);
       };
 
+
+    const handleOpenAssignedByModal = (assignedTo) => {
+        setSelectedAssignedBy(assignedTo);
+        setIsAssignedByModalOpen(true);
+    };
     // Pagination logic
     const indexOfLastSalesCommissions = currentPage * itemsPerPage;
     const indexOfFirstSalesCommissions = indexOfLastSalesCommissions - itemsPerPage;
@@ -136,6 +146,7 @@ function SalesCommission() {
                             <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Target Amount</th>
                             <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Commission Rate</th>
                             <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Date</th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">AssignedBy</th>
                             <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Status</th>
                             <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Action</th>
                         </tr>
@@ -148,6 +159,16 @@ function SalesCommission() {
                                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">{commission.targetAmount}</td>
                                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">{commission.commissionRate}</td>
                                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">{formatDate(commission.createdAt)}</td>
+                                    <td className="px-6 py-4">
+                                        <button
+                                            className="btn btn-primary"
+                                            onClick={() => handleOpenAssignedByModal(commission.assignedTo)}
+                                        >
+                                            View AssignedBy
+                                        </button>
+                                    </td>
+
+
                                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">{commission.status}</td>
                                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
                                         <button className="btn btn-primary mr-2" onClick={() => handleEdit(commission)}>Edit</button>
@@ -228,6 +249,38 @@ function SalesCommission() {
                     </div>
                 </div>
             )}
+
+            {isAssignedByModalOpen && (
+                <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+                    <div className="bg-white p-6 rounded-lg shadow-xl w-96">
+                        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Assigned By</h2>
+                        <div className="max-h-60 overflow-y-auto">
+                            <ul className="space-y-2">
+                                {selectedAssignedBy.length > 0 ? (
+                                    selectedAssignedBy.map((assign, index) => (
+                                        <li 
+                                            key={index} 
+                                            className="p-2 bg-gray-100 rounded-md text-gray-700 text-lg"
+                                        >
+                                            {assign.userId.firstName} {assign.userId.lastName}
+                                        </li>
+                                    ))
+                                ) : (
+                                    <li className="text-lg text-gray-500">No assigned users</li>
+                                )}
+                            </ul>
+                        </div>
+                        <button
+                            className="mt-6 w-full py-2 bg-red-500 text-white font-semibold rounded-md hover:bg-red-600 transition duration-300"
+                            onClick={() => setIsAssignedByModalOpen(false)}
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
+            <EmployeeAddedSalesCommissions />
+            <EmployeeSalesCommissionsStatus/>
         </div>
     );
 }

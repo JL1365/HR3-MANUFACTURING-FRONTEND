@@ -146,7 +146,7 @@ function MySalesCommissionStatus() {
             <table className="min-w-full divide-y divide-gray-200 border border-gray-300">
                 <thead className="bg-gray-100">
                     <tr>
-                        {["Commission Name", "Target Amount", "Commission Rate", "Status"].map((header) => (
+                        {["Commission Name", "Target Amount","Total Sales", "Commission Rate", "Status"].map((header) => (
                             <th key={header} className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                 {header}
                             </th>
@@ -159,6 +159,7 @@ function MySalesCommissionStatus() {
                             <tr key={commission._id} className="hover:bg-gray-300 hover:text-white">
                                 <td className="px-6 py-4 text-gray-700">{commission.salesCommissionId?.salesCommissionName || "N/A"}</td>
                                 <td className="px-6 py-4 text-gray-700">{commission.salesCommissionId?.targetAmount || 0}</td>
+                                <td className="px-6 py-4 text-gray-700">{commission.totalSales || 0}</td> 
                                 <td className="px-6 py-4 text-gray-700">{commission.salesCommissionId?.commissionRate || 0}%</td>
                                 <td className="px-6 py-4 font-semibold">{commission.salesStatus}</td>
                             </tr>

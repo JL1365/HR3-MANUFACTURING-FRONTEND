@@ -18,6 +18,7 @@ import IncentivesManagement from "./private/admin/incentive/IncentivesManagement
 import IncentiveTracking from "./private/admin/incentive/IncentiveTracking";
 import SalesCommission from "./private/admin/incentive/SalesCommission";
 import RecognitionPrograms from "./private/admin/incentive/RecognitionPrograms";
+import CompensationPlanning from "./private/admin/compensation/CompensationPlanning";
 
 /* EMPLOYEE SIDE */
 import BenefitOverview from "./private/employee/eBenefit/BenefitOverview";
@@ -112,6 +113,15 @@ function App() {
           element={
             <LayoutWithSidebar>
               <RecognitionPrograms />
+            </LayoutWithSidebar>
+          }
+        />
+
+          <Route
+          path="/compensation-planning"
+          element={
+            <LayoutWithSidebar>
+              <CompensationPlanning />
             </LayoutWithSidebar>
           }
         />

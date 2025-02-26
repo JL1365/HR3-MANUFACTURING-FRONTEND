@@ -153,12 +153,12 @@ function RecognitionPrograms() {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
   // Pagination logic
-  const indexOfLastRecongnitionPrograms = currentPage * itemsPerPage;
-  const indexOfFirstRecongnitionPrograms =
-    indexOfLastRecongnitionPrograms - itemsPerPage;
+  const indexOfLastRecognitionPrograms = currentPage * itemsPerPage;
+  const indexOfFirstRecognitionPrograms =
+    indexOfLastRecognitionPrograms - itemsPerPage;
   const currentRecognitionPrograms = allRecognitionPrograms.slice(
-    indexOfFirstRecongnitionPrograms,
-    indexOfLastRecongnitionPrograms
+    indexOfFirstRecognitionPrograms,
+    indexOfLastRecognitionPrograms
   );
   const totalPages = Math.ceil(allRecognitionPrograms.length / itemsPerPage);
 
@@ -168,7 +168,7 @@ function RecognitionPrograms() {
 
   return (
     <div>
-      <Header title="Recongnition Programs" />
+      <Header title="Recognition Programs" />
       <ToastContainer />
 
       <button

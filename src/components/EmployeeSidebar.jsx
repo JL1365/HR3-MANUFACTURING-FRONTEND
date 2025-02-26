@@ -42,7 +42,7 @@ const EmployeeSidebar = () => {
       subItems: [
         { name: "My sales", href: "/my-sales-commission" },
         { name: "My tracking", href: "/my-incentives-tracking" },
-        { name: "Recognition", href: "/recognition-programs" },
+        { name: "Recognition", href: "/my-recognition-programs" },
       ],
     },
     {

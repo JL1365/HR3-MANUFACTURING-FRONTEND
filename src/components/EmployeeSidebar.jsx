@@ -50,6 +50,7 @@ const EmployeeSidebar = () => {
       href: "/compensation-overview",
       icon: DollarSign,
       subItems: [
+        { name: "Penalties Overview", href: "/penalties-overview" },
         { name: "Salary Structure", href: "/my-salary-structure" },
       ],
     },

@@ -33,6 +33,7 @@ import MySalesCommission from "./private/employee/eIncentive/MySalesCommission";
 import MyRecognitionPrograms from "./private/employee/eIncentive/MyRecognitionPrograms";
 
 import CompensationOverview from "./private/employee/ecompensation/CompensationOverview";
+import PenaltyOverview from "./private/employee/ecompensation/PenaltiesOverview";
 
 function App() {
   return (
@@ -211,6 +212,14 @@ function App() {
           element={
             <LayoutWithSidebar>
               <CompensationOverview />
+            </LayoutWithSidebar>
+          }
+        />
+        <Route
+          path="/penalties-overview"
+          element={
+            <LayoutWithSidebar>
+              <PenaltyOverview />
             </LayoutWithSidebar>
           }
         />

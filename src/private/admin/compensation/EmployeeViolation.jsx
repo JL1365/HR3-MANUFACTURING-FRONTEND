@@ -321,7 +321,7 @@ function EmployeeViolation() {
               <div>
                 <label>Violation Date</label>
                 <input
-                  type="date"
+                  type="datetime-local"
                   name="violationDate"
                   value={formData.violationDate}
                   onChange={handleChange}

@@ -39,6 +39,7 @@ import PenaltyOverview from "./private/employee/ecompensation/PenaltiesOverview"
 
 import RequestSalaryDistribution from "./private/employee/epayroll/RequestSalaryDistribution";
 import EmployeeSalaryDistributionRequests from "./private/admin/payroll/EmployeeSalaryDistributionRequests";
+import EmployeeBenefitDetails from "./private/admin/benefit/EmployeeBenefitsDetails";
 
 function App() {
   return (
@@ -88,6 +89,14 @@ function App() {
           element={
             <LayoutWithSidebar>
               <DeductionManagement />
+            </LayoutWithSidebar>
+          }
+        />
+          <Route
+          path="/employee-details"
+          element={
+            <LayoutWithSidebar>
+              <EmployeeBenefitDetails />
             </LayoutWithSidebar>
           }
         />

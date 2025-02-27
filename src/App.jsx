@@ -37,6 +37,9 @@ import MyRecognitionPrograms from "./private/employee/eIncentive/MyRecognitionPr
 import CompensationOverview from "./private/employee/ecompensation/CompensationOverview";
 import PenaltyOverview from "./private/employee/ecompensation/PenaltiesOverview";
 
+import RequestSalaryDistribution from "./private/employee/epayroll/RequestSalaryDistribution";
+import EmployeeSalaryDistributionRequests from "./private/admin/payroll/EmployeeSalaryDistributionRequests";
+
 function App() {
   return (
     <Routes>
@@ -141,6 +144,16 @@ function App() {
             </LayoutWithSidebar>
           }
         />
+        {/* PAYROLL */}
+          <Route
+          path="/employee-salary-distribution-requests"
+          element={
+            <LayoutWithSidebar>
+              <EmployeeSalaryDistributionRequests />
+            </LayoutWithSidebar>
+          }
+        />
+
         </Route>
         {/* EMPLOYEE SIDE */}
         <Route element={<EmployeeRoute/>}>
@@ -226,6 +239,15 @@ function App() {
           element={
             <LayoutWithSidebar>
               <PenaltyOverview />
+            </LayoutWithSidebar>
+          }
+        />
+        {/* SALARY */}
+        <Route
+          path="/my-salary-distribution-requests"
+          element={
+            <LayoutWithSidebar>
+              <RequestSalaryDistribution />
             </LayoutWithSidebar>
           }
         />

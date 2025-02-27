@@ -61,7 +61,7 @@ const AdminSidebar = () => {
       subItems: [
         { name: "Salary computation", href: "/salary-computation" },
         { name: "Request a Budget", href: "/request-budget"},
-        { name: "Payroll Distribution", href: "/payroll-distribution"},
+        { name: "Payroll Distribution Requests", href: "/employee-salary-distribution-requests"},
       ],
     },
     { name: "Predictive", href: "/predictive-analytics", icon: TrendingUp },

@@ -60,7 +60,7 @@ const EmployeeSidebar = () => {
       icon: DollarSign,
       subItems: [
         { name: "Salary Structure", href: "/my-salary-structure" },
-        { name: "Payroll Distribution", href: "/payroll-distribution-request" },
+        { name: "Salary Distribution", href: "/my-salary-distribution-requests" },
         { name: "My payslip", href: "/my-payslip" },
       ],
     },

@@ -51,6 +51,7 @@ const AdminSidebar = () => {
       icon: Briefcase,
       subItems: [
         { name: "Grievance Request", href: "/grievance-request"},
+        { name: "Penalty Level", href: "/penalty-level"},
       ],
     },
     {

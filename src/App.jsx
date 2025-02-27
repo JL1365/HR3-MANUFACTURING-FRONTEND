@@ -24,6 +24,7 @@ import CompensationPlanning from "./private/admin/compensation/CompensationPlann
 import BenefitOverview from "./private/employee/eBenefit/BenefitOverview";
 import ApplyBenefit from "./private/employee/eBenefit/ApplyBenefitRequest";
 import MyDeductions from "./private/employee/eBenefit/MyDeductions";
+import PenaltyLevel from "./private/admin/compensation/PenaltyLevel";
 
 import IncentivesOverview from "./private/employee/eIncentive/IncentivesOverview";
 import MyIncentivesTracking from "./private/employee/eIncentive/MyIncentiveTracking";
@@ -124,6 +125,15 @@ function App() {
           element={
             <LayoutWithSidebar>
               <CompensationPlanning />
+            </LayoutWithSidebar>
+          }
+        />
+
+          <Route
+          path="/penalty-level"
+          element={
+            <LayoutWithSidebar>
+              <PenaltyLevel />
             </LayoutWithSidebar>
           }
         />

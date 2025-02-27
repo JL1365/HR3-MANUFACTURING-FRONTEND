@@ -8,6 +8,8 @@ import Login from "./public/Login";
 import NotFound from "./components/NotFound";
 import AdminDashboard from "./private/admin/AdminDashboard";
 import EmployeeDashboard from "./private/employee/EmployeeDashboard";
+import AdminRoute from "./components/AdminRoute";
+import EmployeeRoute from "./components/EmployeeRoute";
 
 /* ADMIN SIDE */
 import BenefitsManagement from "./private/admin/benefit/BenefitsManagement";
@@ -53,6 +55,7 @@ function App() {
           }
         />
         {/* ADMIN SIDE */}
+        <Route element={<AdminRoute/>}>
         <Route
         path="/profile"
         element={
@@ -138,7 +141,10 @@ function App() {
             </LayoutWithSidebar>
           }
         />
+        </Route>
         {/* EMPLOYEE SIDE */}
+        <Route element={<EmployeeRoute/>}>
+     
         <Route
         path="/profile"
         element={
@@ -223,6 +229,7 @@ function App() {
             </LayoutWithSidebar>
           }
         />
+      </Route>
       </Route>
 
     </Routes>

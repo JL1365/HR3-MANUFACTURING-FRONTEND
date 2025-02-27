@@ -12,8 +12,8 @@ function EmployeeViolation() {
   const [users, setUsers] = useState([]);
   const [formData, setFormData] = useState({
     userId: "",
-    violationType:"",
-    penaltyLevel:"",
+    violationType: "",
+    penaltyLevel: "",
     violationDate: "",
     comments: "",
   });
@@ -29,8 +29,16 @@ function EmployeeViolation() {
 
   const fetchViolations = async () => {
     try {
+      const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:7687/api/violation/get-all-violations"
+        "http://localhost:7687/api/violation/get-all-violations",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
       );
       console.log(response.data);
       setEmployeeViolations(response.data.employeeViolations || []);
@@ -40,8 +48,16 @@ function EmployeeViolation() {
   };
   const fetchUsers = async () => {
     try {
+      const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:7687/api/auth/get-all-users"
+        "http://localhost:7687/api/auth/get-all-users",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
       );
       setUsers(response.data.users || []);
     } catch (error) {
@@ -51,8 +67,16 @@ function EmployeeViolation() {
 
   const fetchPenalties = async () => {
     try {
+      const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:7687/api/penalty/get-all-penalties"
+        "http://localhost:7687/api/penalty/get-all-penalties",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
       );
       setAllPenaltyLevels(response.data.allPenaltyLevels || []);
     } catch (error) {
@@ -62,16 +86,31 @@ function EmployeeViolation() {
   const handleCreateOrUpdate = async (e) => {
     e.preventDefault();
     try {
+      const token = localStorage.getItem("token");
       if (isEditing) {
         await axios.put(
           `http://localhost:7687/api/violation/update-violation-status/${editingItem}`,
-          formData
+          formData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            withCredentials: true,
+          }
         );
         toast.success("Violation updated successfully!");
       } else {
         await axios.post(
           "http://localhost:7687/api/violation/create-penalty-violation",
-          formData
+          formData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            withCredentials: true,
+          }
         );
         toast.success("Penalty violation created successfully!");
       }
@@ -95,7 +134,7 @@ function EmployeeViolation() {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value || "", // Prevents `undefined` issues
+      [name]: value || "",
     }));
   };
 
@@ -104,19 +143,22 @@ function EmployeeViolation() {
     setFormData({
       userId: employeeViolation.userId ? employeeViolation.userId._id : "",
       violationType: employeeViolation.violationType,
-      penaltyLevel: employeeViolation.penaltyLevel ? employeeViolation.penaltyLevel._id : "",
-      violationDate: employeeViolation.violationDate ? new Date(employeeViolation.violationDate).toISOString().split("T")[0] : "",
+      penaltyLevel: employeeViolation.penaltyLevel
+        ? employeeViolation.penaltyLevel._id
+        : "",
+      violationDate: employeeViolation.violationDate
+        ? new Date(employeeViolation.violationDate).toISOString().slice(0, 16)
+        : "",
       comments: employeeViolation.comments,
     });
     setIsEditing(true);
     setIsOpenModal(true);
   };
-  
 
   const resetForm = () => {
     setFormData({
       userId: "",
-      violationType:"",
+      violationType: "",
       penaltyLevel: "",
       violationDate: "",
       comments: "",
@@ -129,8 +171,16 @@ function EmployeeViolation() {
     if (!window.confirm("Are you sure you want to delete this item?")) return;
     toast.success("Item deleted successfully!");
     try {
+      const token = localStorage.getItem("token");
       await axios.delete(
-        `http://localhost:7687/api/violation/delete-violation/${id}`
+        `http://localhost:7687/api/violation/delete-violation/${id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
       );
       setEmployeeViolations(
         employeeViolations.filter((alViolations) => alViolations._id !== id)
@@ -140,7 +190,13 @@ function EmployeeViolation() {
     }
   };
   const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
@@ -157,6 +213,7 @@ function EmployeeViolation() {
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
+  const filteredViolations = employeeViolations?.filter((v) => v !== null);
 
   return (
     <div>
@@ -196,43 +253,46 @@ function EmployeeViolation() {
           </thead>
           <tbody>
             {currentEmployeeViolations.length > 0 ? (
-              currentEmployeeViolations.map((violation) => (
-                <tr
-                  key={violation._id}
-                  className="hover:bg-gray-300 hover:text-white"
-                >
-                  <td>
-                    {violation.userId.firstName} {violation.userId.lastName}
-                  </td>
+              currentEmployeeViolations
+                .filter((violation) => violation && violation.penaltyLevel)
+                .map((violation) => (
+                  <tr
+                    key={violation._id}
+                    className="hover:bg-gray-300 hover:text-white"
+                  >
+                    <td>
+                      {violation.userId?.firstName || "Unknown"}{" "}
+                      {violation.userId?.lastName || ""}
+                    </td>
 
-                  <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                    {violation.penaltyLevel.violationType}
-                  </td>
-                  <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                    {violation.penaltyLevel.penaltyLevel}
-                  </td>
-                  <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                    {formatDate(violation.violationDate)}
-                  </td>
-                  <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                    {violation.comments}
-                  </td>
-                  <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                    <button
-                      className="btn btn-primary mr-2"
-                      onClick={() => handleEdit(violation)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="btn btn-error"
-                      onClick={() => handleDelete(violation._id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
+                    <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                      {violation.penaltyLevel?.violationType || "N/A"}
+                    </td>
+                    <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                      {violation.penaltyLevel?.penaltyLevel || "N/A"}
+                    </td>
+                    <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                      {formatDate(violation.violationDate)}
+                    </td>
+                    <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                      {violation.comments || "No comments"}
+                    </td>
+                    <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                      <button
+                        className="btn btn-primary mr-2"
+                        onClick={() => handleEdit(violation)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-error"
+                        onClick={() => handleDelete(violation._id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
             ) : (
               <tr>
                 <td colSpan="5" className="px-6 py-4 text-center">
@@ -285,17 +345,6 @@ function EmployeeViolation() {
                     </option>
                   ))}
                 </select>
-              </div>
-              <div>
-                <label>Violation Type</label>
-                <input
-                  type="text"
-                  name="violationType"
-                  value={formData.violationType}
-                  onChange={handleChange}
-                  required
-                  className="border p-2 w-full"
-                />
               </div>
               <div>
                 <label>Penalty Level</label>

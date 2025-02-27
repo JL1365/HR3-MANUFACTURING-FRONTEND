@@ -47,44 +47,36 @@ function EmployeeSalesCommissionsStatus() {
     return (
         <div>
             <ToastContainer />
-            <div>
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+            <div className="overflow-x-auto">
+                <table className="min-w-full border border-gray-300">
+                    <thead className="bg-gray-200">
                         <tr>
-                            <th className="px-6 py-4">Employee Name</th>
-                            <th className="px-6 py-4">Sales Status</th>
-                            <th className="px-6 py-4">Total Sales</th>
-                            <th className="px-6 py-4">Target Amount</th>
-                            <th className="px-6 py-4">Status</th>
+                            <th className="px-6 py-4 border">Employee Name</th>
+                            <th className="px-6 py-4 border">Sales Status</th>
+                            <th className="px-6 py-4 border">Total Sales</th>
+                            <th className="px-6 py-4 border">Target Amount</th>
+                            <th className="px-6 py-4 border">Status</th>
+                            <th className="px-6 py-4 border">Date</th>
                         </tr>
                     </thead>
                     <tbody>
                         {currentSalesCommissions.length > 0 ? (
                             currentSalesCommissions.map((commission) => (
-                                <tr key={commission._id}>
-                                    <td className="px-6 py-4">
-                                        {commission.userId?.firstname} {commission.userId?.lastname}
+                                <tr key={commission._id} className="border-t">
+                                    <td className="px-6 py-4 border">
+                                        {commission.userId?.firstName} {commission.userId?.lastName}
                                     </td>
-                                    <td className="px-6 py-4">{commission.salesStatus}</td>
-                                    <td className="px-6 py-4">{commission.totalSales || "N/A"}</td>
-                                    <td className="px-6 py-4">{commission.targetAmount || "N/A"}</td>
-                                    <td className="px-6 py-4">{commission.confirmationStatus}</td>
-                                    <td className="px-6 py-4">{formatDate(commission.createdAt)}</td>
-                                    <td className="px-6 py-4">
-                                        {commission.confirmationStatus === "Pending" && (
-                                            <>
-                                                <button onClick={() => updateStatus(commission._id, "Approved")}
-                                                    className="bg-green-500 text-white px-3 py-1 rounded mx-1">Approve</button>
-                                                <button onClick={() => updateStatus(commission._id, "Rejected")}
-                                                    className="bg-red-500 text-white px-3 py-1 rounded mx-1">Reject</button>
-                                            </>
-                                        )}
-                                    </td>
+                                    <td className="px-6 py-4 border">{commission.salesStatus || "N/A"}</td>
+                                    <td className="px-6 py-4 border">{commission.totalSales || "N/A"}</td>
+                                    <td className="px-6 py-4 border">{commission.salesCommissionId?.targetAmount || "N/A"}</td>
+                                    <td className="px-6 py-4 border">{commission.totalSales}</td>
+                                    <td className="px-6 py-4 border">{formatDate(commission.createdAt)}</td>
+                                   
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="8" className="px-6 py-4 text-center">No sales commissions found.</td>
+                                <td colSpan="7" className="px-6 py-4 text-center border">No sales commissions found.</td>
                             </tr>
                         )}
                     </tbody>

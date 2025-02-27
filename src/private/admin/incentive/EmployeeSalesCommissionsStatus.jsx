@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function EmployeeSalesCommissionsStatus() {
@@ -46,7 +46,7 @@ function EmployeeSalesCommissionsStatus() {
 
     return (
         <div>
-            <ToastContainer />
+      
             <div className="overflow-x-auto">
                 <table className="min-w-full border border-gray-300">
                     <thead className="bg-gray-200">

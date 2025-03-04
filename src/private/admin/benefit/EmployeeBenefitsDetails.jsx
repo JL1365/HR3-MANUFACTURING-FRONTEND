@@ -2,6 +2,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "../../../components/Header";
 
+const BENEFIT_URL = process.env.NODE_ENV === "development" 
+  ? "http://localhost:7687/api/benefit" 
+  : "https://backend-hr3.jjm-manufacturing.com/api/benefit";
+
+
 function EmployeeBenefitsDetails() {
   const [employeeBenefits, setEmployeeBenefits] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -18,7 +23,7 @@ function EmployeeBenefitsDetails() {
   const fetchEmployeeBenefitDetails = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:7687/api/benefit/get-all-employees-benefit-details"
+        `${BENEFIT_URL}/get-all-employees-benefit-details`
       );
       const benefitRequests = response.data.benefitRequests.map((request) => ({
         ...request,

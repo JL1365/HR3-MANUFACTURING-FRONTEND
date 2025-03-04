@@ -4,6 +4,10 @@ import { useOutletContext } from "react-router-dom";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+const SALES_COMMISSION_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/salesCommission" 
+: "https://backend-hr3.jjm-manufacturing.com/api/salesCommission";
+
 function MySalesCommissionStatus() {
     const { user } = useOutletContext();
     const [myCommissions, setMySalesCommissionStatus] = useState([]);
@@ -25,7 +29,7 @@ function MySalesCommissionStatus() {
     const fetchMySalesStatus = async () => {
         try {
             const response = await axios.get(
-                "http://localhost:7687/api/salesCommission/get-my-sales-commission-status",
+                `${SALES_COMMISSION_URL}/get-my-sales-commission-status`,
                 { withCredentials: true }
             );
             setMySalesCommissionStatus(Array.isArray(response.data.myCommissions) ? response.data.myCommissions : []);
@@ -37,7 +41,7 @@ function MySalesCommissionStatus() {
     const fetchMyAssignedSalesCommissions = async () => {
         try {
             const response = await axios.get(
-                "http://localhost:7687/api/salesCommission/get-my-assigned-sales-commissions",
+                `${SALES_COMMISSION_URL}/get-my-assigned-sales-commissions`,
                 { withCredentials: true }
             );
             setSalesCommissionList(response.data.assignedCommissions || []);
@@ -66,7 +70,7 @@ function MySalesCommissionStatus() {
 
         try {
             await axios.post(
-                "http://localhost:7687/api/salesCommission/add-my-sales-commission",
+                `${SALES_COMMISSION_URL}/add-my-sales-commission`,
                 formData,
                 { withCredentials: true, headers: { "Content-Type": "multipart/form-data" } }
             );

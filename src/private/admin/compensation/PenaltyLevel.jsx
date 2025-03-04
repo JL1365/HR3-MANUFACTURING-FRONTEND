@@ -5,6 +5,11 @@ import "react-toastify/dist/ReactToastify.css";
 import Header from "../../../components/Header";
 import EmployeeViolation from "./EmployeeViolation";
 
+const PENALTY_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/penalty" 
+: "https://backend-hr3.jjm-manufacturing.com/api/penalty";
+
+
 function PenaltyLevel() {
   const [allPenaltyLevels, setAllPenaltyLevels] = useState([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -27,7 +32,7 @@ function PenaltyLevel() {
   const fetchPenalties = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:7687/api/penalty/get-all-penalties"
+        `${PENALTY_URL}/get-all-penalties`
       );
       setAllPenaltyLevels(response.data.allPenaltyLevels || []);
     } catch (error) {
@@ -40,13 +45,13 @@ function PenaltyLevel() {
     try {
       if (isEditing) {
         await axios.put(
-          `http://localhost:7687/api/penalty/update-penalty/${editingItem}`,
+          `${PENALTY_URL}/update-penalty/${editingItem}`,
           formData
         );
         toast.success("Penalty updated successfully!");
       } else {
         await axios.post(
-          "http://localhost:7687/api/penalty/create-penalty-level",
+          `${PENALTY_URL}/create-penalty-level`,
           formData
         );
         toast.success("Penalty created successfully!");
@@ -102,7 +107,7 @@ function PenaltyLevel() {
     toast.success("Item deleted successfully!");
     try {
       await axios.delete(
-        `http://localhost:7687/api/penalty/delete-penalty/${id}`
+        `${PENALTY_URL}/delete-penalty/${id}`
       );
       setAllPenaltyLevels(
         allPenaltyLevels.filter((allPenalty) => allPenalty._id !== id)

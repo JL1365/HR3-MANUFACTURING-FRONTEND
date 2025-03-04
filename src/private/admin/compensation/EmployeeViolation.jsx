@@ -3,6 +3,18 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+const VIOLATION_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/violation" 
+: "https://backend-hr3.jjm-manufacturing.com/api/violation";
+
+const AUTH_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/auth" 
+: "https://backend-hr3.jjm-manufacturing.com/api/auth";
+
+const PENALTY_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/penalty" 
+: "https://backend-hr3.jjm-manufacturing.com/api/penalty";
+
 function EmployeeViolation() {
   const [employeeViolations, setEmployeeViolations] = useState([]);
   const [allPenaltyLevels, setAllPenaltyLevels] = useState([]);
@@ -31,7 +43,7 @@ function EmployeeViolation() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:7687/api/violation/get-all-violations",
+        `${VIOLATION_URL}/get-all-employee-violations`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -50,7 +62,7 @@ function EmployeeViolation() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:7687/api/auth/get-all-users",
+        `${AUTH_URL}/get-all-users`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -69,7 +81,7 @@ function EmployeeViolation() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:7687/api/penalty/get-all-penalties",
+        `${PENALTY_URL}/get-all-penalties`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -89,7 +101,7 @@ function EmployeeViolation() {
       const token = localStorage.getItem("token");
       if (isEditing) {
         await axios.put(
-          `http://localhost:7687/api/violation/update-violation-status/${editingItem}`,
+          `${VIOLATION_URL}/update-violation-status/${editingItem}`,
           formData,
           {
             headers: {
@@ -102,7 +114,7 @@ function EmployeeViolation() {
         toast.success("Violation updated successfully!");
       } else {
         await axios.post(
-          "http://localhost:7687/api/violation/create-penalty-violation",
+          `${VIOLATION_URL}/create-penalty-violation`,
           formData,
           {
             headers: {
@@ -173,7 +185,7 @@ function EmployeeViolation() {
     try {
       const token = localStorage.getItem("token");
       await axios.delete(
-        `http://localhost:7687/api/violation/delete-violation/${id}`,
+        `${VIOLATION_URL}/delete-violation/${id}`,
         {
           headers: {
             "Content-Type": "application/json",

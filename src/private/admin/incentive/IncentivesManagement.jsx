@@ -4,6 +4,10 @@ import Header from "../../../components/Header";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+const INCENTIVE_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/incentive" 
+: "https://backend-hr3.jjm-manufacturing.com/api/incentive";
+
 function IncentivesManagement() {
     const [allIncentives, setIncentives] = useState([]);
     const [isOpenModal, setIsOpenModal] = useState(false);
@@ -24,7 +28,7 @@ function IncentivesManagement() {
 
     const fetchIncentives = async () => {
         try {
-            const response = await axios.get("http://localhost:7687/api/incentive/get-all-incentives");
+            const response = await axios.get(`${INCENTIVE_URL}/get-all-incentives`);
             setIncentives(response.data.allIncentives || []);
         } catch (error) {
             console.error("Error fetching incentives:", error);
@@ -35,10 +39,10 @@ function IncentivesManagement() {
         e.preventDefault();
         try {
             if (isEditing) {
-                await axios.put(`http://localhost:7687/api/incentive/update-incentive/${editingItem}`, formData);
+                await axios.put(`${INCENTIVE_URL}/update-incentive/${editingItem}`, formData);
                 toast.success("Incentive updated successfully!");
             } else {
-                await axios.post("http://localhost:7687/api/incentive/create-incentive", formData);
+                await axios.post(`${INCENTIVE_URL}/create-incentive`, formData);
                 toast.success("Incentive created successfully!");
             }
             resetForm();
@@ -83,7 +87,7 @@ function IncentivesManagement() {
         if (!window.confirm("Are you sure you want to delete this item?")) return;
         toast.success("Item deleted successfully!");
         try {
-            await axios.delete(`http://localhost:7687/api/incentive/delete-incentive/${id}`);
+            await axios.delete(`${INCENTIVE_URL}/delete-incentive/${id}`);
             setIncentives(allIncentives.filter((allIncentive) => allIncentive._id !== id));
         } catch (error) {
             toast.error("Failed to delete item");

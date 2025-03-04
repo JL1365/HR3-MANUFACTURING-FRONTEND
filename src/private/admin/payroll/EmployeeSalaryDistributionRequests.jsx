@@ -4,6 +4,10 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "../../../components/Header";
 
+const SALARY_REQUEST_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/salaryRequest" 
+: "https://backend-hr3.jjm-manufacturing.com/api/salaryRequest";
+
 function EmployeeSalaryDistributionRequests() {
     const [allSalaryDistributionRequests, setAllSalaryDistributionRequests] = useState([]);
     const [isRequestAvailable, setIsRequestAvailable] = useState(true);
@@ -17,7 +21,7 @@ function EmployeeSalaryDistributionRequests() {
     const fetchAllSalaryDistributionRequests = async () => {
         try {
             const response = await axios.get(
-                "http://localhost:7687/api/salaryRequest/get-all-salary-distribution-requests",
+                `${SALARY_REQUEST_URL}/get-all-salary-distribution-requests`,
                 { withCredentials: true }
             );
             if (response.data.success) {
@@ -34,7 +38,7 @@ function EmployeeSalaryDistributionRequests() {
     const handleReviewRequest = async (requestId, action) => {
         try {
             const response = await axios.put(
-                `http://localhost:7687/api/salaryRequest/review-salary-distribution-request/${requestId}`,
+                `${SALARY_REQUEST_URL}/review-salary-distribution-request/${requestId}`,
                 { action },
                 { withCredentials: true }
             );
@@ -48,7 +52,7 @@ function EmployeeSalaryDistributionRequests() {
     };
     const toggleRequestAvailability = async () => {
         try {
-            const response = await axios.put("http://localhost:7687/api/salaryRequest/toggle-request-availability", {}, { withCredentials: true });
+            const response = await axios.put(`${SALARY_REQUEST_URL}/toggle-request-availability`, {}, { withCredentials: true });
             toast.success(response.data.message);
             setIsRequestAvailable(!isRequestAvailable);
         } catch (error) {
@@ -99,7 +103,7 @@ function EmployeeSalaryDistributionRequests() {
                         currentRequests.map((request) => (
                         <tr key={request._id} className="bg-white border-b">
                             <td className="px-6 py-4 whitespace-nowrap">
-                            {request.userId?.firstName} {request.userId?.lastName}
+                            {request.user?.firstName} {request.user?.lastName}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">{request.paymentMethod}</td>
                             <td className="px-6 py-4 whitespace-nowrap">{request.gCashNumber || "N/A"}</td>

@@ -3,6 +3,10 @@ import axios from "axios";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+const SALES_COMMISSION_URL = process.env.NODE_ENV === "development" 
+  ? "http://localhost:7687/api/salesCommission" 
+  : "https://backend-hr3.jjm-manufacturing.com/api/salesCommission";
+
 function EmployeeSalesCommissionsStatus() {
     const [employeeSalesStatus, setEmployeeSalesStatus] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -14,7 +18,7 @@ function EmployeeSalesCommissionsStatus() {
 
     const fetchAllSalesCommissionsStatus = async () => {
         try {
-            const response = await axios.get("http://localhost:7687/api/salesCommission/get-all-employee-sales-status", { withCredentials: true });
+            const response = await axios.get(`${SALES_COMMISSION_URL}/get-all-employee-sales-status`, { withCredentials: true });
             setEmployeeSalesStatus(Array.isArray(response.data.employeeSalesStatus) ? response.data.employeeSalesStatus : []);
         } catch (error) {
             console.error("Error fetching Sales commission:", error);
@@ -24,7 +28,7 @@ function EmployeeSalesCommissionsStatus() {
 
     const updateStatus = async (id, status) => {
         try {
-            await axios.put(`http://localhost:7687/api/salesCommission/update-status/${id}`, { confirmationStatus: status }, { withCredentials: true });
+            await axios.put(`${SALES_COMMISSION_URL}/update-status/${id}`, { confirmationStatus: status }, { withCredentials: true });
             toast.success(`Status updated to ${status}`);
             fetchAllSalesCommissionsStatus();
         } catch (error) {

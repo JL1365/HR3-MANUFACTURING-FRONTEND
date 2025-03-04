@@ -4,29 +4,34 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "../../../components/Header";
 
+const BENEFIT_REQUESTED_URL = process.env.NODE_ENV === "development" 
+  ? "http://localhost:7687/api/benefitRequest" 
+  : "https://backend-hr3.jjm-manufacturing.com/api/benefitRequest";
+
+
 function ApplyBenefit() {
-  const [allRequestBenefit, setAllRequestBenefit] = useState([]);
+  const [updatedRequestBenefit, setUpdatedRequestBenefit] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   useEffect(() => {
-    fetchallRequestBenefited();
+    fetchupdatedRequestBenefited();
   }, []);
 
-  const fetchallRequestBenefited = async () => {
+  const fetchupdatedRequestBenefited = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:7687/api/benefitRequest/get-all-applied-requests",
+        `${BENEFIT_REQUESTED_URL}/get-all-applied-requests`,
         {
           withCredentials: true,
         }
       );
-      if (response.data.allRequestBenefit) {
-        const sortedBenefits = response.data.allRequestBenefit.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        setAllRequestBenefit(sortedBenefits);
+      if (response.data.updatedRequestBenefit) {
+        const sortedBenefits = response.data.updatedRequestBenefit.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setUpdatedRequestBenefit(sortedBenefits);
       } else {
         toast.warn("No apply requests found.");
-        setAllRequestBenefit([]);
+        setUpdatedRequestBenefit([]);
       }
     } catch (error) {
       toast.error(
@@ -43,18 +48,18 @@ function ApplyBenefit() {
 
   const indexOfLastBenefit = currentPage * itemsPerPage;
   const indexOfFirstBenefit = indexOfLastBenefit - itemsPerPage;
-  const currentBenefits = allRequestBenefit.slice(
+  const currentBenefits = updatedRequestBenefit.slice(
     indexOfFirstBenefit,
     indexOfLastBenefit
   );
-  const totalPages = Math.ceil(allRequestBenefit.length / itemsPerPage);
+  const totalPages = Math.ceil(updatedRequestBenefit.length / itemsPerPage);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
 
   const updateRequestStatus = async (requestId, newStatus) => {
-    const currentRequest = allRequestBenefit.find(benefit => benefit._id === requestId);
+    const currentRequest = updatedRequestBenefit.find(benefit => benefit._id === requestId);
 
     if (currentRequest.status === "Approved" || currentRequest.status === "Denied") {
       toast.warn(`Cannot change status. Current status is already ${currentRequest.status}.`);
@@ -68,7 +73,7 @@ function ApplyBenefit() {
         { withCredentials: true }
       );
       toast.success(response.data.message);
-      fetchallRequestBenefited();
+      fetchupdatedRequestBenefited();
     } catch (error) {
       toast.error(
         "Error updating benefit request status: " +
@@ -98,9 +103,12 @@ function ApplyBenefit() {
             {currentBenefits.length > 0 ? (
               currentBenefits.map((benefit) => (
                 <tr key={benefit._id} className="hover:bg-gray-300 hover:text-white">
-                  <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                    {benefit.userId ? `${benefit.userId.firstName} ${benefit.userId.lastName}` : "N/A"}
-                  </td>
+<td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+  {benefit?.user?.firstName && benefit?.user?.lastName
+    ? `${benefit.user.firstName} ${benefit.user.lastName}`
+    : "N/A"}
+</td>
+
                   <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
                     {benefit.benefitId ? benefit.benefitId.benefitName : "N/A"}
                   </td>

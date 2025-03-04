@@ -5,9 +5,19 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import StandardCompensationPlanning from "./StandardCompensationPlanning";
 
+const COMPENSATION_URL =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:7687/api/compensation"
+    : "https://backend-hr3.jjm-manufacturing.com/api/compensation";
+
+const AUTH_URL =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:7687/api/auth"
+    : "https://backend-hr3.jjm-manufacturing.com/api/auth";
+
 function CompensationPlanning() {
   const [compensationPlans, setCompensationPlans] = useState([]);
-  const [users,setUsers] = useState()
+  const [positions, setPositions] = useState();
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -17,6 +27,7 @@ function CompensationPlanning() {
     overTimeRate: "",
     holidayRate: "",
     allowances: [],
+    benefits: [],
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,14 +35,14 @@ function CompensationPlanning() {
 
   useEffect(() => {
     fetchCompensationplans();
-    fetchUsers();
+    fetchPositions();
   }, []);
 
   const fetchCompensationplans = async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:7687/api/compensation/get-compensation-plans",
+        `${COMPENSATION_URL}/get-compensation-plans`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -49,21 +60,21 @@ function CompensationPlanning() {
       );
     }
   };
-  const fetchUsers = async () => {
+  const fetchPositions = async () => {
     try {
-        const response = await axios.get("http://localhost:7687/api/auth/get-all-users");
-        setUsers(response.data.users || []);
+      const response = await axios.get(`${AUTH_URL}/get-all-positions`);
+      setPositions(response.data.positions || []);
     } catch (error) {
-        console.error("Error fetching users:", error);
+      console.error("Error fetching positions:", error);
     }
-};
+  };
   const handleCreateOrUpdate = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
       if (isEditing) {
         await axios.put(
-          `http://localhost:7687/api/compensation/update-compensation-plan/${editingItem}`,
+          `${COMPENSATION_URL}/update-compensation-plan/${editingItem}`,
           formData,
           {
             headers: {
@@ -77,7 +88,7 @@ function CompensationPlanning() {
       } else {
         const token = localStorage.getItem("token");
         await axios.post(
-          "http://localhost:7687/api/compensation/create-compensation-plan",
+          `${COMPENSATION_URL}/create-compensation-plan`,
           formData,
           {
             headers: {
@@ -111,7 +122,6 @@ function CompensationPlanning() {
       [name]: value,
     });
   };
-  
 
   const handleEdit = (compensation) => {
     setEditingItem(compensation._id);
@@ -121,11 +131,12 @@ function CompensationPlanning() {
       overTimeRate: compensation.overTimeRate,
       holidayRate: compensation.holidayRate,
       allowances: compensation.allowances,
+      benefits: compensation.benefits,
     });
     setIsEditing(true);
     setIsOpenModal(true);
   };
-  
+
   const resetForm = () => {
     setFormData({
       position: "",
@@ -133,6 +144,7 @@ function CompensationPlanning() {
       overTimeRate: "",
       holidayRate: "",
       allowances: [],
+      benefits: [],
     });
     setEditingItem(null);
     setIsEditing(false);
@@ -144,16 +156,13 @@ function CompensationPlanning() {
     try {
       const token = localStorage.getItem("token");
 
-      await axios.delete(
-        `http://localhost:7687/api/compensation/delete-compensation-plan/${id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        }
-      );
+      await axios.delete(`${COMPENSATION_URL}/delete-compensation-plan/${id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      });
       setCompensationPlans(
         compensationPlans.filter((compensation) => compensation._id !== id)
       );
@@ -213,6 +222,9 @@ function CompensationPlanning() {
                 Allowances
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                Benefits
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
                 Action
               </th>
             </tr>
@@ -225,7 +237,7 @@ function CompensationPlanning() {
                   className="hover:bg-gray-300 hover:text-white"
                 >
                   <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                    {compensation.position?.position}
+                    {compensation.positionName}
                   </td>
                   <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
                     {compensation.hourlyRate}
@@ -250,7 +262,20 @@ function CompensationPlanning() {
                       "No allowances"
                     )}
                   </td>
-
+                  <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                    {compensation.benefits &&
+                    compensation.benefits.length > 0 ? (
+                      <ul>
+                        {compensation.benefits.map((benefit, index) => (
+                          <li key={index}>
+                            {benefit.benefitType}: ₱{benefit.deductionsAmount}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      "No benefits"
+                    )}
+                  </td>
                   <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
                     <button
                       className="btn btn-primary mr-2"
@@ -304,23 +329,24 @@ function CompensationPlanning() {
                 : "Create Compensation Plan"}
             </h2>
             <form onSubmit={handleCreateOrUpdate}>
-            <div>
-          <label>Position</label>
-          <select
-            name="position"
-            value={formData.position}
-            onChange={handleChange}
-            className="border p-2 w-full"
-          >
-            <option value="">Select Position</option>
-            {users &&
-              users.map((user) => (
-                <option key={user._id} value={user.position}>
-                  {user.position}
-                </option>
-              ))}
-          </select>
-        </div>
+              <div>
+                <label>Position</label>
+                <select
+                  className="form-select"
+                  value={formData.position}
+                  onChange={(e) =>
+                    setFormData({ ...formData, position: e.target.value })
+                  }
+                  disabled={isEditing}
+                >
+                  <option value="">Select Position</option>
+                  {positions.map((pos, index) => (
+                    <option key={index} value={pos}>
+                      {pos}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div>
                 <label>Hourly Rate</label>
                 <input
@@ -374,6 +400,7 @@ function CompensationPlanning() {
                           className="border p-2 w-full"
                         />
                       </div>
+
                       <div>
                         <label>Amount</label>
                         <input
@@ -391,6 +418,22 @@ function CompensationPlanning() {
                           required
                           className="border p-2 w-full"
                         />
+                      </div>
+                      <div className="flex justify-center items-end">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setFormData({
+                              ...formData,
+                              allowances: formData.allowances.filter(
+                                (_, i) => i !== index
+                              ),
+                            })
+                          }
+                          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition duration-200"
+                        >
+                          Remove
+                        </button>
                       </div>
                     </div>
                   ))
@@ -412,6 +455,85 @@ function CompensationPlanning() {
                   className="px-4 py-2 bg-blue-500 text-white rounded"
                 >
                   Add Allowance
+                </button>
+
+                {/* BENEFITS */}
+                {formData.benefits.length > 0 ? (
+                  formData.benefits.map((benefit, index) => (
+                    <div key={index} className="flex justify-between mb-4">
+                      <div>
+                        <label>Benefit Type</label>
+                        <input
+                          type="text"
+                          name={`benefitType${index}`}
+                          value={benefit.benefitType}
+                          onChange={(e) => {
+                            const newBenefits = [...formData.benefits];
+                            newBenefits[index].benefitType = e.target.value;
+                            setFormData({
+                              ...formData,
+                              benefits: newBenefits,
+                            });
+                          }}
+                          required
+                          className="border p-2 w-full"
+                        />
+                      </div>
+                      <div>
+                        <label>Amount</label>
+                        <input
+                          type="number"
+                          name={`deductionsAmount${index}`}
+                          value={benefit.deductionsAmount}
+                          onChange={(e) => {
+                            const newBenefits = [...formData.benefits];
+                            newBenefits[index].deductionsAmount =
+                              e.target.value;
+                            setFormData({
+                              ...formData,
+                              benefits: newBenefits,
+                            });
+                          }}
+                          required
+                          className="border p-2 w-full"
+                        />
+                      </div>
+                      <div className="flex justify-center items-end">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setFormData({
+                              ...formData,
+                              benefits: formData.benefits.filter(
+                                (_, i) => i !== index
+                              ),
+                            })
+                          }
+                          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition duration-200"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div>No benefits available</div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setFormData({
+                      ...formData,
+                      benefits: [
+                        ...formData.benefits,
+                        { benefitType: "", deductionsAmount: "" },
+                      ],
+                    })
+                  }
+                  className="px-4 py-2 bg-blue-500 text-white rounded"
+                >
+                  Add Benefits
                 </button>
               </div>
               <button
@@ -437,4 +559,3 @@ function CompensationPlanning() {
 }
 
 export default CompensationPlanning;
-

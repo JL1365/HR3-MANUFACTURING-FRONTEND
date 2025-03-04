@@ -33,6 +33,8 @@ const AdminSidebar = () => {
       subItems: [
         { name: "Applied request", href: "/applied-request" },
         { name: "Deductions", href: "/deduction-management"},
+        { name: "Employee Benefit Details", href: "/employee-benefit-details"},
+        { name: "Send Documents", href: "/send-documents"},
       ],
     },
     {
@@ -56,7 +58,6 @@ const AdminSidebar = () => {
     },
     {
       name: "Payroll Processing",
-      href: "/payroll-processing",
       icon: DollarSign,
       subItems: [
         { name: "Salary computation", href: "/salary-computation" },

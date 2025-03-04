@@ -4,6 +4,11 @@ import Header from "../../../components/Header";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+const TRACKING_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/incentiveTracking" 
+: "https://backend-hr3.jjm-manufacturing.com/api/incentiveTracking";
+
+
 function MyIncentivesTracking() {
     const [myIncentivesTracking, setMyIncentivesTracking] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -16,7 +21,7 @@ function MyIncentivesTracking() {
     const fetchMyIncentiveTracking = async () => {
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.get("http://localhost:7687/api/incentiveTracking/get-my-incentives-tracking", {
+            const response = await axios.get(`${TRACKING_URL}/get-my-incentives-tracking`, {
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`,
@@ -37,7 +42,7 @@ function MyIncentivesTracking() {
         try {
             const token = localStorage.getItem("token");
             const response = await axios.put(
-                `http://localhost:7687/api/incentiveTracking/update-my-incentive-tracking-status/${trackingId}`,
+                `${TRACKING_URL}/update-my-incentive-tracking-status/${trackingId}`,
                 { status: "Received" },
                 {
                     headers: {

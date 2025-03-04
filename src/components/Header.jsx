@@ -3,6 +3,10 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const AUTH_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/auth" 
+: "https://backend-hr3.jjm-manufacturing.com/api/auth";
+
 const Header = ({ title }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
@@ -13,7 +17,7 @@ const Header = ({ title }) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:7687/api/auth/logout",
+        `${AUTH_URL}/logout`,
         {},
         { withCredentials: true }
       );

@@ -22,6 +22,8 @@ import SalesCommission from "./private/admin/incentive/SalesCommission";
 import RecognitionPrograms from "./private/admin/incentive/RecognitionPrograms";
 import CompensationPlanning from "./private/admin/compensation/CompensationPlanning";
 
+import BudgetRequestForm from "./private/admin/payroll/BudgetRequest";
+
 /* EMPLOYEE SIDE */
 import BenefitOverview from "./private/employee/eBenefit/BenefitOverview";
 import ApplyBenefit from "./private/employee/eBenefit/ApplyBenefitRequest";
@@ -40,13 +42,15 @@ import PenaltyOverview from "./private/employee/ecompensation/PenaltiesOverview"
 import RequestSalaryDistribution from "./private/employee/epayroll/RequestSalaryDistribution";
 import EmployeeSalaryDistributionRequests from "./private/admin/payroll/EmployeeSalaryDistributionRequests";
 import EmployeeBenefitDetails from "./private/admin/benefit/EmployeeBenefitsDetails";
+import SendDocuments from "./private/admin/benefit/SendDocuments";
+import PayrollOverview from "./private/admin/payroll/PayrollOverview";
 
 function App() {
   return (
     <Routes>
       <Route element={<PublicRoute />}>
         <Route path="/" element={<Login />} />
-        {/* <Route  path="*" element={<NotFound/>}/> */}
+        <Route  path="*" element={<NotFound/>}/>
       </Route>
 
       <Route element={<ProtectedRoute allowedHr={[3]} />}>
@@ -93,10 +97,18 @@ function App() {
           }
         />
           <Route
-          path="/employee-details"
+          path="/employee-benefit-details"
           element={
             <LayoutWithSidebar>
               <EmployeeBenefitDetails />
+            </LayoutWithSidebar>
+          }
+        />
+          <Route
+          path="/send-documents"
+          element={
+            <LayoutWithSidebar>
+              <SendDocuments />
             </LayoutWithSidebar>
           }
         />
@@ -155,10 +167,26 @@ function App() {
         />
         {/* PAYROLL */}
           <Route
+          path="/request-budget"
+          element={
+            <LayoutWithSidebar>
+              <BudgetRequestForm />
+            </LayoutWithSidebar>
+          }
+        />
+          <Route
           path="/employee-salary-distribution-requests"
           element={
             <LayoutWithSidebar>
               <EmployeeSalaryDistributionRequests />
+            </LayoutWithSidebar>
+          }
+        />
+          <Route
+          path="/payroll-overview"
+          element={
+            <LayoutWithSidebar>
+              <PayrollOverview/>
             </LayoutWithSidebar>
           }
         />

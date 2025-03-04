@@ -9,12 +9,15 @@ import 'react-toastify/dist/ReactToastify.css';
 import InputComponents from "../components/InputComponents";
 import jjmLogo from "../assets/jjmlogo.jpg";
 
+const AUTH_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/auth" 
+: "https://backend-hr3.jjm-manufacturing.com/api/auth";
 
 
 function Login() {
 
     const [formData, setFormData] = useState({
-    identifier: "",
+    email: "",
     password: "",
   });
   const navigate = useNavigate();
@@ -27,23 +30,30 @@ function Login() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
-      const response = await axios.post("http://localhost:7687/api/auth/login", formData, {
+      const response = await axios.post(`${AUTH_URL}/testLog`, formData, {
         withCredentials: true,
       });
-
+  
       if (response.status === 200) {
         toast.success("Login successful!", { autoClose: 2000 });
+  
+        const { redirectUrl } = response.data;
+  
+        if (redirectUrl) {
+          window.location.href = redirectUrl; // Redirect to the respective HR module
+        } else {
+          navigate("/dashboard"); // Default navigation if no redirect URL is provided
+        }
       }
-      navigate("/dashboard")
     } catch (error) {
       toast.error(error.response?.data?.message || "Login failed!", { autoClose: 2000 });
     }
   };
+  
 
   return (
     <div className="hero bg-base-200 min-h-screen flex justify-center items-center">
@@ -68,10 +78,10 @@ function Login() {
               <InputComponents
                 icon={User}
                 type="text"
-                name="identifier"
+                name="email"
                 placeholder="Enter your email or username"
                 className="input input-bordered w-full"
-                value={formData.identifier}
+                value={formData.email}
                 onChange={handleChange}
                 required
               />

@@ -4,8 +4,17 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "../../../components/Header";
 
+const DEDUCTIONS_URL = process.env.NODE_ENV === "development" 
+  ? "http://localhost:7687/api/benefitDeduction" 
+  : "https://backend-hr3.jjm-manufacturing.com/api/benefitDeduction";
+
+  const BENEFIT_REQUESTED_URL = process.env.NODE_ENV === "development" 
+  ? "http://localhost:7687/api/benefitRequest" 
+  : "https://backend-hr3.jjm-manufacturing.com/api/benefitRequest";
+
+
 function DeductionManagement() {
-  const [allRequestBenefit, setAllRequestBenefit] = useState([]);
+  const [updatedRequestBenefit, setUpdatedRequestBenefit] = useState([]);
   const [allDeductions, setAllDeductions] = useState([]);
   const [selectedUser, setSelectedUser] = useState("");
   const [selectedBenefit, setSelectedBenefit] = useState("");
@@ -19,7 +28,7 @@ function DeductionManagement() {
   const [newAmount, setNewAmount] = useState("");
   const [modalPage, setModalPage] = useState(1);
   const modalItemsPerPage = 5;
-  
+
   useEffect(() => {
     fetchAllAppliedRequests();
     fetchAllDeductions();
@@ -28,11 +37,15 @@ function DeductionManagement() {
   const fetchAllAppliedRequests = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:7687/api/benefitRequest/get-all-applied-requests",
+        `${BENEFIT_REQUESTED_URL}/get-all-applied-requests`,
         { withCredentials: true }
       );
-      if (response.data.allRequestBenefit) {
-        setAllRequestBenefit(response.data.allRequestBenefit);
+      console.log(
+        "Fetched Benefit Requests: ",
+        response.data.updatedRequestBenefit
+      );
+      if (response.data.updatedRequestBenefit) {
+        setUpdatedRequestBenefit(response.data.updatedRequestBenefit);
       } else {
         toast.warn("No benefit requests found.");
       }
@@ -44,55 +57,84 @@ function DeductionManagement() {
   const fetchAllDeductions = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:7687/api/benefitDeduction/get-all-deductions",
+        `${DEDUCTIONS_URL}/get-all-deductions`,
         { withCredentials: true }
       );
-      if (response.data.deductions) {
+      console.log("Fetched Deductions: ", response.data); // Check full response
+      
+      if (response.data.deductions && response.data.deductions.length > 0) {
+        console.log("First deduction structure:", response.data.deductions[0]);
         setAllDeductions(response.data.deductions);
         groupDeductions(response.data.deductions);
       } else {
+        console.warn("No deductions found or empty array returned");
         toast.warn("No deductions found.");
       }
     } catch (error) {
       toast.error("Error fetching deductions.");
+      console.error("Error details:", error); // Log full error
     }
   };
 
-  const groupDeductions = (deductions) => {
-    const grouped = deductions.reduce((acc, deduction) => {
-      const userId = deduction.userId._id;
-      if (!acc[userId]) {
-        acc[userId] = {
-          user: deduction.userId,
-          deductions: [],
-        };
-      }
-      acc[userId].deductions.push(deduction);
+const groupDeductions = (deductions) => {
+  const grouped = deductions.reduce((acc, deduction) => {
+    // Check if user property exists and has the expected structure
+    if (!deduction.user) {
+      console.log("Missing user data for deduction:", deduction);
       return acc;
-    }, {});
-    setGroupedDeductions(grouped);
-  };
-
+    }
+    
+    const userId = deduction.userId; // This should be the string ID
+    
+    if (!acc[userId]) {
+      acc[userId] = {
+        user: deduction.user, // Use the user object returned from API
+        deductions: [],
+      };
+    }
+    
+    acc[userId].deductions.push(deduction);
+    return acc;
+  }, {});
+  
+  setGroupedDeductions(grouped);
+  console.log("Grouped deductions:", grouped); // Debug log
+};
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+ 
     if (!selectedUser || !selectedBenefit || !amount || isNaN(amount)) {
       toast.error("Please provide valid inputs.");
       return;
     }
 
-    const request = allRequestBenefit.find(
+    console.log("Selected User:", selectedUser);
+    console.log("Selected Benefit:", selectedBenefit);
+    console.log("Updated Request Benefit:", updatedRequestBenefit);
+
+    const request = updatedRequestBenefit.find(
       (req) =>
-        req.userId._id === selectedUser && req.benefitId._id === selectedBenefit
+        req.userId === selectedUser && 
+        req.benefitId._id === selectedBenefit 
     );
 
-    if (!request || request.status !== "Approved") {
+    console.log("Selected Request:", request);
+
+    if (!request) {
+      toast.error("Selected benefit request not found.");
+      return;
+    }
+
+    if (request.status !== "Approved") {
       toast.error("Selected benefit request is not approved.");
       return;
     }
 
+    // Make the API request to add the deduction
     try {
       const response = await axios.post(
-        "http://localhost:7687/api/benefitDeduction/add-user-deduction",
+        `${DEDUCTIONS_URL}/add-user-deduction`,
         {
           userId: selectedUser,
           benefitRequestId: request._id,
@@ -123,16 +165,16 @@ function DeductionManagement() {
       toast.error("Please enter a valid amount.");
       return;
     }
-  
+
     try {
       const response = await axios.put(
-        `http://localhost:7687/api/benefitDeduction/update-user-deduction/${editingDeduction._id}`,
+        `${DEDUCTIONS_URL}/update-user-deduction/${editingDeduction._id}`,
         { amount: parseFloat(newAmount) },
         { withCredentials: true }
       );
-  
+
       toast.success(response.data.message);
-  
+
       setSelectedUserDeductions((prev) =>
         prev.map((deduction) =>
           deduction._id === editingDeduction._id
@@ -140,7 +182,7 @@ function DeductionManagement() {
             : deduction
         )
       );
-  
+
       setEditingDeduction(null);
       setNewAmount("");
       fetchAllDeductions();
@@ -148,7 +190,6 @@ function DeductionManagement() {
       toast.error("Error updating deduction.");
     }
   };
-  
 
   return (
     <div className="p-5">
@@ -174,14 +215,17 @@ function DeductionManagement() {
               >
                 <option value="">Select User</option>
                 {[
-                  ...new Set(allRequestBenefit.map((req) => req.userId._id)),
+                  ...new Set(updatedRequestBenefit.map((req) => req.userId)),
                 ].map((userId) => {
-                  const user = allRequestBenefit.find(
-                    (req) => req.userId._id === userId
-                  )?.userId;
+                  const user = updatedRequestBenefit.find(
+                    (req) => req.userId === userId
+                  )?.user;
+
                   return (
                     <option key={userId} value={userId}>
-                      {user.firstName} {user.lastName}
+                      {user?.firstName && user?.lastName
+                        ? `${user.firstName} ${user.lastName}`
+                        : "Unknown User"}
                     </option>
                   );
                 })}
@@ -191,14 +235,14 @@ function DeductionManagement() {
                 value={selectedBenefit}
                 onChange={(e) => setSelectedBenefit(e.target.value)}
                 className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider w-full"
-                disabled={!selectedUser}
+                disabled={!selectedUser} // Disabled until a user is selected
               >
                 <option value="">Select Benefit</option>
-                {allRequestBenefit
-                  .filter((req) => req.userId._id === selectedUser)
+                {updatedRequestBenefit
+                  .filter((req) => req.userId === selectedUser) // Show only benefits requested by selected user
                   .map((req) => (
                     <option key={req.benefitId._id} value={req.benefitId._id}>
-                      {req.benefitId.benefitName}
+                      {req.benefitId?.benefitName || "Unknown Benefit"}
                     </option>
                   ))}
               </select>
@@ -218,7 +262,13 @@ function DeductionManagement() {
               >
                 Add Deduction
               </button>
-              <button type="button" onClick={() => setisOpenModal(false)} className="mt-4 px-4 py-2 bg-red-500 text-white rounded">Cancel</button>
+              <button
+                type="button"
+                onClick={() => setisOpenModal(false)}
+                className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
+              >
+                Cancel
+              </button>
             </form>
           </div>
         </div>
@@ -269,120 +319,132 @@ function DeductionManagement() {
 
       {/* Modal for showing deductions */}
       {selectedUserDeductions && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-    <div className="bg-white p-5 rounded w-1/2">
-      <h2 className="text-xl font-semibold mb-4">Deductions Details</h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-5 rounded w-1/2">
+            <h2 className="text-xl font-semibold mb-4">Deductions Details</h2>
 
-      {/* Modal Pagination Logic */}
-      {(() => {
-        const modalTotalPages = Math.ceil(selectedUserDeductions.length / modalItemsPerPage);
-        const paginatedModalDeductions = selectedUserDeductions.slice(
-          (modalPage - 1) * modalItemsPerPage,
-          modalPage * modalItemsPerPage
-        );
+            {/* Modal Pagination Logic */}
+            {(() => {
+              const modalTotalPages = Math.ceil(
+                selectedUserDeductions.length / modalItemsPerPage
+              );
+              const paginatedModalDeductions = selectedUserDeductions.slice(
+                (modalPage - 1) * modalItemsPerPage,
+                modalPage * modalItemsPerPage
+              );
 
-        return (
-          <>
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Benefit Name</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Amount</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedModalDeductions.map((deduction) => (
-                  <tr key={deduction._id} className="hover:bg-gray-300 hover:text-white">
-                    <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                      {deduction.BenefitRequestId?.benefitId?.benefitName || "N/A"}
-                    </td>
-                    <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                      ₱{deduction.amount.toFixed(2)}
-                    </td>
-                    <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                      {new Date(deduction.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                      <button
-                        className="bg-blue-500 text-white p-2 rounded"
-                        onClick={() => setEditingDeduction(deduction)}
-                      >
-                        Edit
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+              return (
+                <>
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                          Benefit Name
+                        </th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                          Amount
+                        </th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                          Date
+                        </th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paginatedModalDeductions.map((deduction) => (
+                        <tr
+                          key={deduction._id}
+                          className="hover:bg-gray-300 hover:text-white"
+                        >
+                          <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                            {deduction.BenefitRequestId?.benefitId
+                              ?.benefitName || "N/A"}
+                          </td>
+                          <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                            ₱{deduction.amount.toFixed(2)}
+                          </td>
+                          <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                            {new Date(deduction.createdAt).toLocaleDateString()}
+                          </td>
+                          <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                            <button
+                              className="bg-blue-500 text-white p-2 rounded"
+                              onClick={() => setEditingDeduction(deduction)}
+                            >
+                              Edit
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
 
-            {/* Pagination Controls */}
-            <div className="flex justify-center mt-4">
+                  {/* Pagination Controls */}
+                  <div className="flex justify-center mt-4">
+                    <button
+                      disabled={modalPage === 1}
+                      onClick={() => setModalPage(modalPage - 1)}
+                      className="px-4 py-2 mx-1 bg-gray-300 rounded"
+                    >
+                      Previous
+                    </button>
+                    <span className="px-4 py-2">
+                      Page {modalPage} of {modalTotalPages}
+                    </span>
+                    <button
+                      disabled={modalPage === modalTotalPages}
+                      onClick={() => setModalPage(modalPage + 1)}
+                      className="px-4 py-2 mx-1 bg-gray-300 rounded"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </>
+              );
+            })()}
+
+            <button
+              className="bg-red-500 text-white p-2 rounded mt-4"
+              onClick={() => {
+                setSelectedUserDeductions(null);
+                setModalPage(1);
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {editingDeduction && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-5 rounded w-1/3">
+            <h2 className="text-xl font-semibold mb-4">Update Deduction</h2>
+            <input
+              type="number"
+              className="w-full p-2 border border-gray-300 rounded mb-4"
+              value={newAmount}
+              onChange={(e) => setNewAmount(e.target.value)}
+            />
+            <div className="flex justify-end">
               <button
-                disabled={modalPage === 1}
-                onClick={() => setModalPage(modalPage - 1)}
-                className="px-4 py-2 mx-1 bg-gray-300 rounded"
+                className="bg-green-500 text-white p-2 rounded mr-2"
+                onClick={handleUpdateDeduction}
               >
-                Previous
+                Update
               </button>
-              <span className="px-4 py-2">
-                Page {modalPage} of {modalTotalPages}
-              </span>
               <button
-                disabled={modalPage === modalTotalPages}
-                onClick={() => setModalPage(modalPage + 1)}
-                className="px-4 py-2 mx-1 bg-gray-300 rounded"
+                className="bg-gray-500 text-white p-2 rounded"
+                onClick={() => setEditingDeduction(null)}
               >
-                Next
+                Cancel
               </button>
             </div>
-          </>
-        );
-      })()}
-
-      <button
-        className="bg-red-500 text-white p-2 rounded mt-4"
-        onClick={() => {
-          setSelectedUserDeductions(null);
-          setModalPage(1);
-        }}
-      >
-        Close
-      </button>
-    </div>
-  </div>
-)}
-
-
-{editingDeduction && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-    <div className="bg-white p-5 rounded w-1/3">
-      <h2 className="text-xl font-semibold mb-4">Update Deduction</h2>
-      <input
-        type="number"
-        className="w-full p-2 border border-gray-300 rounded mb-4"
-        value={newAmount}
-        onChange={(e) => setNewAmount(e.target.value)}
-      />
-      <div className="flex justify-end">
-        <button
-          className="bg-green-500 text-white p-2 rounded mr-2"
-          onClick={handleUpdateDeduction}
-        >
-          Update
-        </button>
-        <button
-          className="bg-gray-500 text-white p-2 rounded"
-          onClick={() => setEditingDeduction(null)}
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+          </div>
+        </div>
+      )}
     </div>
   );
 }

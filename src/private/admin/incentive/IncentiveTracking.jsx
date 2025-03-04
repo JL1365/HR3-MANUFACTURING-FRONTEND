@@ -4,8 +4,20 @@ import Header from "../../../components/Header";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+const TRACKING_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/incentiveTracking" 
+: "https://backend-hr3.jjm-manufacturing.com/api/incentiveTracking";
+
+const AUTH_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/auth" 
+: "https://backend-hr3.jjm-manufacturing.com/api/auth";
+
+const INCENTIVE_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/incentive" 
+: "https://backend-hr3.jjm-manufacturing.com/api/incentive";
+
 function IncentiveTracking() {
-    const [allIncentivesTracking, setIncentiveTracking] = useState([]);
+    const [updatedIncentiveTrackings, setIncentiveTracking] = useState([]);
     const [users, setUsers] = useState([]);
     const [incentives, setIncentives] = useState([]);
     const [isOpenModal, setIsOpenModal] = useState(false);
@@ -25,9 +37,9 @@ function IncentiveTracking() {
 
     const fetchIncentiveTracking = async () => {
         try {
-            const response = await axios.get("http://localhost:7687/api/incentiveTracking/get-all-incentive-tracking");
+            const response = await axios.get(`${TRACKING_URL}/get-all-incentive-tracking`);
             console.log(response.data);
-            setIncentiveTracking(response.data.allIncentivesTracking || []);
+            setIncentiveTracking(response.data || []);
         } catch (error) {
             console.error("Error fetching incentive Tracking:", error);
         }
@@ -35,7 +47,7 @@ function IncentiveTracking() {
     
     const fetchUsers = async () => {
         try {
-            const response = await axios.get("http://localhost:7687/api/auth/get-all-users");
+            const response = await axios.get(`${AUTH_URL}/get-all-users`);
             setUsers(response.data.users || []);
         } catch (error) {
             console.error("Error fetching users:", error);
@@ -45,7 +57,7 @@ function IncentiveTracking() {
 
     const fetchIncentives = async () => {
         try {
-            const response = await axios.get("http://localhost:7687/api/incentive/get-all-incentives");
+            const response = await axios.get(`${INCENTIVE_URL}/get-all-incentives`);
             setIncentives(response.data.allIncentives || []);
         } catch (error) {
             console.error("Error fetching incentives:", error);
@@ -57,8 +69,8 @@ function IncentiveTracking() {
         if (!window.confirm("Are you sure you want to delete this item?")) return;
         toast.success("Item deleted successfully!");
         try {
-            await axios.delete(`http://localhost:7687/api/incentiveTracking/delete-incentive-tracking/${id}`);
-            setIncentiveTracking(allIncentivesTracking.filter((allIncentiveTrack) => allIncentiveTrack._id !== id));
+            await axios.delete(`${TRACKING_URL}/delete-incentive-tracking/${id}`);
+            setIncentiveTracking(updatedIncentiveTrackings.filter((allIncentiveTrack) => allIncentiveTrack._id !== id));
         } catch (error) {
             toast.error("Failed to delete item");
         }
@@ -84,7 +96,7 @@ function IncentiveTracking() {
             const token = localStorage.getItem("token");
             if (formData._id) {
                 await axios.put(
-                    `http://localhost:7687/api/incentiveTracking/update-incentive-tracking/${formData._id}`, 
+                    `${TRACKING_URL}/update-incentive-tracking/${formData._id}`, 
                     formData, 
                     {
                         headers: {
@@ -97,7 +109,7 @@ function IncentiveTracking() {
                 toast.success("Incentive tracking updated successfully!");
             } else {
                 await axios.post(
-                    "http://localhost:7687/api/incentiveTracking/create-incentive-tracking",
+                    `${TRACKING_URL}/create-incentive-tracking`,
                     formData, 
                     {
                         headers: {
@@ -124,8 +136,8 @@ function IncentiveTracking() {
     // Pagination logic
     const indexOfLastIncentive = currentPage * itemsPerPage;
     const indexOfFirstIncentive = indexOfLastIncentive - itemsPerPage;
-    const currentIncentives = allIncentivesTracking.slice(indexOfFirstIncentive, indexOfLastIncentive);
-    const totalPages = Math.ceil(allIncentivesTracking.length / itemsPerPage);
+    const currentIncentives = updatedIncentiveTrackings.slice(indexOfFirstIncentive, indexOfLastIncentive);
+    const totalPages = Math.ceil(updatedIncentiveTrackings.length / itemsPerPage);
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
@@ -172,9 +184,10 @@ function IncentiveTracking() {
 {currentIncentives.length > 0 ? (
     currentIncentives.map((tracking) => (
         <tr key={tracking._id} className="hover:bg-gray-300 hover:text-white">
-            <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                {tracking.userId?.firstName} {tracking.userId?.lastName}
-            </td>
+<td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+    {tracking.userId ? `${tracking.user?.firstName} ${tracking.user?.lastName}` : "User not assigned"}
+</td>
+
             <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
                 {tracking.incentiveId?.incentiveName} ({tracking.incentiveId?.incentiveType})
             </td>

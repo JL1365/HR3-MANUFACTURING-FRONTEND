@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+const VIOLATION_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/violation" 
+: "https://backend-hr3.jjm-manufacturing.com/api/violation";
+
 function MyViolations() {
   const [myViolations, setMyViolations] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -14,7 +18,7 @@ function MyViolations() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:7687/api/violation/get-my-violations",
+        `${VIOLATION_URL}/get-my-violations`,
         {
           headers: {
             "Content-Type": "application/json",

@@ -4,6 +4,14 @@ import "react-toastify/dist/ReactToastify.css";
 import Header from "../../../components/Header";
 import StandardCompensationOverview from "./StandardCompensationOverview";
 
+const COMPENSATION_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/compensation" 
+: "https://backend-hr3.jjm-manufacturing.com/api/compensation";
+
+const AUTH_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/auth" 
+: "https://backend-hr3.jjm-manufacturing.com/api/auth";
+
 function CompensationOverview() {
   const [compensationPlans, setCompensationPlans] = useState([]);
   const [users,setUsers] = useState()
@@ -19,7 +27,7 @@ function CompensationOverview() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:7687/api/compensation/get-compensation-plans",
+        `${COMPENSATION_URL}/get-compensation-plans`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -39,7 +47,7 @@ function CompensationOverview() {
   };
   const fetchUsers = async () => {
     try {
-        const response = await axios.get("http://localhost:7687/api/auth/get-all-users");
+        const response = await axios.get(`${AUTH_URL}/get-all-users`);
         setUsers(response.data.users || []);
     } catch (error) {
         console.error("Error fetching users:", error);

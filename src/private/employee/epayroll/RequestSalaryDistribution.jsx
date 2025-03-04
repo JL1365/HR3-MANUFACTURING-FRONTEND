@@ -4,6 +4,10 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "../../../components/Header";
 
+const SALAR_REQUEST_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/salaryRequest" 
+: "https://backend-hr3.jjm-manufacturing.com/api/salaryRequest";
+
 function RequestSalaryDistribution() {
     const [mySalaryDistributionRequests, setMySalaryDistributionRequests] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -19,7 +23,7 @@ function RequestSalaryDistribution() {
   const fetchMySalaryDistributionRequests = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:7687/api/salaryRequest/get-my-salary-distribution-requests",
+        `${SALARY_REQUEST_URL}/get-my-salary-distribution-requests`,
         {
           withCredentials: true,
         }
@@ -46,7 +50,7 @@ function RequestSalaryDistribution() {
   const requestSalaryDistribution = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:7687/api/salaryRequest/request-salary-distribution",
+        `${SALARY_REQUEST_URL}/request-salary-distribution`,
         { paymentMethod, gCashNumber },
         { withCredentials: true }
       );

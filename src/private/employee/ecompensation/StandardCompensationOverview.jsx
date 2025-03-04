@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+
+const COMPENSATION_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/compensation" 
+: "https://backend-hr3.jjm-manufacturing.com/api/compensation";
+
 function StandardCompensationOverview() {
   const [standardCompensations, setStandardCompensations] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -13,7 +18,7 @@ function StandardCompensationOverview() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:7687/api/compensation/get-standard-compensations",
+        `${COMPENSATION_URL}/get-standard-compensations`,
         {
           headers: {
             "Content-Type": "application/json",

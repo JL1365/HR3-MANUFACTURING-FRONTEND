@@ -7,6 +7,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import MySalesCommissionStatus from "./MySalesCommissionStatus";
 import MyAddedSalesCommission from "./MyAddedSalesCommission";
 
+const SALES_COMMISSION_URL = process.env.NODE_ENV === "development" 
+  ? "http://localhost:7687/api/salesCommission" 
+  : "https://backend-hr3.jjm-manufacturing.com/api/salesCommission";
+
+
 function MySalesCommission() {
     const { user } = useOutletContext();
     const [allSalesCommissions, setSalesCommission] = useState([]);
@@ -19,7 +24,7 @@ function MySalesCommission() {
     
     const fetchSalesCommission = async () => {
         try {
-            const response = await axios.get("http://localhost:7687/api/salesCommission/get-all-sales-commission", { withCredentials: true });
+            const response = await axios.get(`${SALES_COMMISSION_URL}/get-all-sales-commission`, { withCredentials: true });
             console.log("Fetched Sales Commissions:", response.data);
             setSalesCommission(response.data || []);
         } catch (error) {
@@ -29,10 +34,12 @@ function MySalesCommission() {
 
     const handleAssign = async (salesCommissionId) => {
         try {
-            await axios.post("http://localhost:7687/api/salesCommission/assign-sales-commission", {
+            const token = localStorage.getItem("token");
+            await axios.post(`${SALES_COMMISSION_URL}/assign-sales-commission`, {
                 salesCommissionId
             }, {
                 headers: { "Content-Type": "application/json" },
+                  Authorization: `Bearer ${token}`,
                 withCredentials: true,
             });
 

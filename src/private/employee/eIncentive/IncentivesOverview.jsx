@@ -4,6 +4,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Header from "../../../components/Header";
 
+const INCENTIVE_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/incentive" 
+: "https://backend-hr3.jjm-manufacturing.com/api/incentive";
+
 function IncentivesOverview() {
     const [allIncentives, setIncentives] = useState([]);    
     const [currentPage, setCurrentPage] = useState(1);
@@ -15,7 +19,7 @@ function IncentivesOverview() {
 
     const fetchIncentives = async () => {
         try {
-            const response = await axios.get("http://localhost:7687/api/incentive/get-all-incentives");
+            const response = await axios.get(`${INCENTIVE_URL}/get-all-incentives`);
             setIncentives(response.data.allIncentives || []);
         } catch (error) {
             console.error("Error fetching incentives:", error);

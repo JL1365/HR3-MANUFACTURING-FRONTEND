@@ -5,6 +5,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Header from "../../../components/Header";
 
+const BENEFIT_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/benefit" 
+: "https://backend-hr3.jjm-manufacturing.com/api/benefit";
+
 function BenefitOverview() {
     const [allBenefits, setBenefits] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -16,7 +20,7 @@ function BenefitOverview() {
 
     const fetchBenefits = async () => {
         try {
-            const response = await axios.get("http://localhost:7687/api/benefit/get-all-benefits");
+            const response = await axios.get(`${BENEFIT_URL}/get-all-benefits`);
             setBenefits(response.data.allBenefits || []);
         } catch (error) {
             console.error("Error fetching benefits:", error);

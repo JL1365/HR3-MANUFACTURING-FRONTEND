@@ -4,6 +4,19 @@ import Header from "../../../components/Header";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+const RECOGNITION_PROGRAM_URL = process.env.NODE_ENV === "development" 
+  ? "http://localhost:7687/api/recognitionProgram" 
+  : "https://backend-hr3.jjm-manufacturing.com/api/recognitionProgram";
+
+  const AUTH_URL = process.env.NODE_ENV === "development" 
+  ? "http://localhost:7687/api/auth" 
+  : "https://backend-hr3.jjm-manufacturing.com/api/auth";
+
+  const INCENTIVE_URL = process.env.NODE_ENV === "development" 
+  ? "http://localhost:7687/api/incentive" 
+  : "https://backend-hr3.jjm-manufacturing.com/api/incentive";
+
+
 function RecognitionPrograms() {
   const [allRecognitionPrograms, setRecognitionPrograms] = useState([]);
   const [users, setUsers] = useState([]);
@@ -27,20 +40,20 @@ function RecognitionPrograms() {
   const fetchRecognitionPrograms = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:7687/api/recognitionProgram/get-all-recognition-programs"
+        `${RECOGNITION_PROGRAM_URL}/get-all-recognition-programs`
       );
-      console.log(response.data);
+      console.log("API Response:", response.data); // I-check kung nandito ang firstName at lastName
       setRecognitionPrograms(response.data || []);
-      console.log("Recognition Programs in State:", allRecognitionPrograms);
     } catch (error) {
       console.error("Error fetching recognition programs:", error);
     }
   };
+  
 
   const fetchUsers = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:7687/api/auth/get-all-users"
+        `${AUTH_URL}/get-all-users`
       );
       setUsers(response.data.users || []);
     } catch (error) {
@@ -51,7 +64,7 @@ function RecognitionPrograms() {
   const fetchIncentives = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:7687/api/incentive/get-all-incentives"
+        `${INCENTIVE_URL}/get-all-incentives`
       );
       setIncentives(response.data.allIncentives || []);
     } catch (error) {
@@ -65,7 +78,7 @@ function RecognitionPrograms() {
     try {
       const token = localStorage.getItem("token");
       await axios.delete(
-        `http://localhost:7687/api/recognitionProgram/delete-recognition-program/${id}`,
+        `${RECOGNITION_PROGRAM_URL}/delete-recognition-program/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -99,15 +112,32 @@ function RecognitionPrograms() {
     });
   };
 
+  const [error, setError] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError(""); // Clear error on change
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const { rewardType, rewardValue } = formData;
+
+    // Validation: Ensure Reward Value is valid for "Bonus" or "Cash"
+    if (["Bonus", "Cash"].includes(rewardType)) {
+      if (!rewardValue || isNaN(rewardValue) || rewardValue <= 0) {
+        setError("Reward value is required and must be a positive number for Bonus or Cash.");
+        return;
+      }
+    }
     try {
       const token = localStorage.getItem("token");
 
       if (formData._id) {
 
         await axios.put(
-          `http://localhost:7687/api/recognitionProgram/update-recognition-program/${formData._id}`,
+          `${RECOGNITION_PROGRAM_URL}/update-recognition-program/${formData._id}`,
           formData,
           {
             headers: {
@@ -121,7 +151,7 @@ function RecognitionPrograms() {
       } else {
      
         await axios.post(
-          "http://localhost:7687/api/recognitionProgram/create-recognition-program",
+          `${RECOGNITION_PROGRAM_URL}/create-recognition-program`,
           formData,
           {
             headers: {
@@ -224,8 +254,8 @@ function RecognitionPrograms() {
                   className="hover:bg-gray-300 hover:text-white"
                 >
                   <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
-                    {recognition.userId?.firstName}{" "}
-                    {recognition.userId?.lastName}
+                    {recognition.user?.firstName}{" "}
+                    {recognition.user?.lastName}
                   </td>
                   <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
                     {recognition.incentiveId
@@ -347,33 +377,38 @@ function RecognitionPrograms() {
                 }
               />
 
-              <label className="block mb-2">Reward Type:</label>
-              <select
-                className="w-full p-2 border rounded mb-4"
-                value={formData.rewardType}
-                onChange={(e) =>
-                  setFormData({ ...formData, rewardType: e.target.value })
-                }
-                required
-              >
-                <option value="">-- Select Reward Type --</option>
-                <option value="Bonus">Bonus</option>
-                <option value="Cash">Cash</option>
-                {/* Add other reward types as needed */}
-              </select>
+      <label className="block mb-2">Reward Type:</label>
+      <select
+        className="w-full p-2 border rounded mb-4"
+        name="rewardType"
+        value={formData.rewardType}
+        onChange={handleChange}
+        required
+      >
+        <option value="">-- Select Reward Type --</option>
+        <option value="Bonus">Bonus</option>
+        <option value="Cash">Cash</option>
+        <option value="Gift">Gift</option>
+        <option value="Promotion">Promotion</option>
+      </select>
 
-              <label className="block mb-2">Reward Value:</label>
-              <input
-                type="number"
-                className="w-full p-2 border rounded mb-4"
-                value={formData.rewardValue}
-                onChange={(e) =>
-                  setFormData({ ...formData, rewardValue: e.target.value })
-                }
-                required
-              />
+      {(formData.rewardType === "Bonus" || formData.rewardType === "Cash") && (
+        <>
+          <label className="block mb-2">Reward Value:</label>
+          <input
+            type="number"
+            className="w-full p-2 border rounded mb-4"
+            name="rewardValue"
+            value={formData.rewardValue}
+            onChange={handleChange}
+            min="1"
+            required
+          />
+        </>
+      )}
 
-              <button
+      {error && <p className="text-red-500">{error}</p>}              
+      <button
                 type="submit"
                 className="mt-4 px-4 py-2 bg-green-500 text-white rounded"
               >

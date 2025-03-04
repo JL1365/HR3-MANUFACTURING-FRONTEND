@@ -3,6 +3,10 @@ import axios from "axios";
 import Header from "../../../components/Header";
 import MyViolations from "./MyViolations";
 
+const PENALTY_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/penalty" 
+: "https://backend-hr3.jjm-manufacturing.com/api/penalty";
+
 function PenaltyOverview() {
   const [allPenaltyLevels, setAllPenaltyLevels] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -15,7 +19,7 @@ function PenaltyOverview() {
   const fetchPenalties = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:7687/api/penalty/get-all-penalties"
+        `${PENALTY_URL}/get-all-penalties`
       );
       setAllPenaltyLevels(response.data.allPenaltyLevels || []);
     } catch (error) {

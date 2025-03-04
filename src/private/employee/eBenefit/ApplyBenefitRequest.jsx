@@ -4,6 +4,14 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "../../../components/Header";
 
+const BENEFIT_REQUEST_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/benefitRequest" 
+: "https://backend-hr3.jjm-manufacturing.com/api/benefitRequest";
+
+const BENEFIT_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/benefit" 
+: "https://backend-hr3.jjm-manufacturing.com/api/benefit";
+
 function ApplyBenefit() {
   const [myApplyRequests, setMyApplyRequests] = useState([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -27,7 +35,7 @@ function ApplyBenefit() {
   const fetchMyApplyRequested = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:7687/api/benefitRequest/get-my-apply-requests",
+        `${BENEFIT_REQUEST_URL}/get-my-apply-requests`,
         {
           withCredentials: true,
         }
@@ -55,7 +63,7 @@ function ApplyBenefit() {
   const fetchBenefits = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:7687/api/benefit/get-all-benefits",
+        `${BENEFIT_URL}/get-all-benefits`,
         {
           withCredentials: true,
         }

@@ -3,6 +3,11 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+const COMPENSATION_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/compensation" 
+: "https://backend-hr3.jjm-manufacturing.com/api/compensation";
+
+
 function StandardCompensationPlanning() {
   const [standardCompensations, setStandardCompensations] = useState([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -25,7 +30,7 @@ function StandardCompensationPlanning() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:7687/api/compensation/get-standard-compensations",
+        `${COMPENSATION_URL}/get-standard-compensations`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -50,7 +55,7 @@ function StandardCompensationPlanning() {
       const token = localStorage.getItem("token");
       if (isEditing) {
         await axios.put(
-          `http://localhost:7687/api/compensation/update-standard-compensation/${editingItem}`,
+          `${COMPENSATION_URL}/update-standard-compensation/${editingItem}`,
           formData,
           {
             headers: {
@@ -64,7 +69,7 @@ function StandardCompensationPlanning() {
       } else {
         const token = localStorage.getItem("token");
         await axios.post(
-          "http://localhost:7687/api/compensation/create-standard-compensation",
+          `${COMPENSATION_URL}/create-standard-compensation`,
           formData,
           {
             headers: {
@@ -127,7 +132,7 @@ function StandardCompensationPlanning() {
       const token = localStorage.getItem("token");
 
       await axios.delete(
-        `http://localhost:7687/api/compensation/delete-standard-compensation/${id}`,
+        `${COMPENSATION_URL}/delete-standard-compensation/${id}`,
         {
           headers: {
             "Content-Type": "application/json",

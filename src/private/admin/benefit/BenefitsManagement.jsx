@@ -4,6 +4,11 @@ import Header from "../../../components/Header";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+const BENEFIT_URL = process.env.NODE_ENV === "development" 
+  ? "http://localhost:7687/api/benefit" 
+  : "https://backend-hr3.jjm-manufacturing.com/api/benefit";
+
+
 function BenefitsManagement() {
     const [allBenefits, setBenefits] = useState([]);
     const [isOpenModal, setIsOpenModal] = useState(false);
@@ -25,7 +30,7 @@ function BenefitsManagement() {
 
     const fetchBenefits = async () => {
         try {
-            const response = await axios.get("http://localhost:7687/api/benefit/get-all-benefits");
+            const response = await axios.get(`${BENEFIT_URL}/get-all-benefits`);
             setBenefits(response.data.allBenefits || []);
         } catch (error) {
             console.error("Error fetching benefits:", error);
@@ -36,10 +41,10 @@ function BenefitsManagement() {
         e.preventDefault();
         try {
             if (isEditing) {
-                await axios.put(`http://localhost:7687/api/benefit/update-benefit/${editingItem}`, formData);
+                await axios.put(`${BENEFIT_URL}/update-benefit/${editingItem}`, formData);
                 toast.success("Benefit updated successfully!");
             } else {
-                await axios.post("http://localhost:7687/api/benefit/create-benefit", formData);
+                await axios.post(`${BENEFIT_URL}/create-benefit`, formData);
                 toast.success("Benefit created successfully!");
             }
             resetForm();
@@ -86,7 +91,7 @@ function BenefitsManagement() {
         if (!window.confirm("Are you sure you want to delete this item?")) return;
         toast.success("Item deleted successfully!");
         try {
-            await axios.delete(`http://localhost:7687/api/benefit/delete-benefit/${id}`);
+            await axios.delete(`${BENEFIT_URL}/delete-benefit/${id}`);
             setBenefits(allBenefits.filter((allBenefit) => allBenefit._id !== id));
         } catch (error) {
             toast.error("Failed to delete item");

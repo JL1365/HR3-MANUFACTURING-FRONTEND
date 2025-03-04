@@ -7,8 +7,13 @@ import EmployeeAddedSalesCommissions from "./EmployeeAddedSalesCommissions";
 import EmployeeSalesCommissionStatus from "./EmployeeSalesCommissionsStatus";
 import EmployeeSalesCommissionsStatus from "./EmployeeSalesCommissionsStatus";
 
+const SALES_COMMISSION_URL = process.env.NODE_ENV === "development" 
+  ? "http://localhost:7687/api/salesCommission" 
+  : "https://backend-hr3.jjm-manufacturing.com/api/salesCommission";
+
+
 function SalesCommission() {
-    const [allSalesCommissions, setSalesCommission] = useState([]);
+    const [updatedAssignedCommissions, setSalesCommission] = useState([]);
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [isAssignedByModalOpen, setIsAssignedByModalOpen] = useState(false);
@@ -30,7 +35,7 @@ function SalesCommission() {
 
     const fetchSalesCommission = async () => {
         try {
-            const response = await axios.get("http://localhost:7687/api/salesCommission/get-all-sales-commission");
+            const response = await axios.get(`${SALES_COMMISSION_URL}/get-all-sales-commission`);
             console.log(response.data)
             setSalesCommission(response.data || []);
         } catch (error) {
@@ -42,10 +47,10 @@ function SalesCommission() {
         e.preventDefault();
         try {
             if (isEditing) {
-                await axios.put(`http://localhost:7687/api/salesCommission/update-sales-commission/${editingItem}`, formData);
+                await axios.put(`${SALES_COMMISSION_URL}/update-sales-commission/${editingItem}`, formData);
                 toast.success("Sales commission updated successfully!");
             } else {
-                await axios.post("http://localhost:7687/api/salesCommission/create-sales-commission", formData);
+                await axios.post(`${SALES_COMMISSION_URL}/create-sales-commission`, formData);
                 toast.success("Sales Commission created successfully!");
             }
             resetForm();
@@ -97,8 +102,8 @@ function SalesCommission() {
         if (!window.confirm("Are you sure you want to delete this item?")) return;
         toast.success("Item deleted successfully!");
         try {
-            await axios.delete(`http://localhost:7687/api/salesCommission/delete-sales-commission/${id}`);
-            setSalesCommission(allSalesCommissions.filter((allCommission) => allCommission._id !== id));
+            await axios.delete(`${SALES_COMMISSION_URL}/delete-sales-commission/${id}`);
+            setSalesCommission(updatedAssignedCommissions.filter((allCommission) => allCommission._id !== id));
         } catch (error) {
             toast.error("Failed to delete item");
         }
@@ -110,15 +115,16 @@ function SalesCommission() {
       };
 
 
-    const handleOpenAssignedByModal = (assignedTo) => {
+      const handleOpenAssignedByModal = (assignedTo) => {
+        console.log("Assigned To Data:", assignedTo); // Add this line
         setSelectedAssignedBy(assignedTo);
         setIsAssignedByModalOpen(true);
     };
     // Pagination logic
     const indexOfLastSalesCommissions = currentPage * itemsPerPage;
     const indexOfFirstSalesCommissions = indexOfLastSalesCommissions - itemsPerPage;
-    const currentSalesCommissions = allSalesCommissions.slice(indexOfFirstSalesCommissions, indexOfLastSalesCommissions);
-    const totalPages = Math.ceil(allSalesCommissions.length / itemsPerPage);
+    const currentSalesCommissions = updatedAssignedCommissions.slice(indexOfFirstSalesCommissions, indexOfLastSalesCommissions);
+    const totalPages = Math.ceil(updatedAssignedCommissions.length / itemsPerPage);
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
@@ -250,35 +256,32 @@ function SalesCommission() {
                 </div>
             )}
 
-            {isAssignedByModalOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-                    <div className="bg-white p-6 rounded-lg shadow-xl w-96">
-                        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Assigned By</h2>
-                        <div className="max-h-60 overflow-y-auto">
-                            <ul className="space-y-2">
-                                {selectedAssignedBy.length > 0 ? (
-                                    selectedAssignedBy.map((assign, index) => (
-                                        <li 
-                                            key={index} 
-                                            className="p-2 bg-gray-100 rounded-md text-gray-700 text-lg"
-                                        >
-                                            {assign.userId.firstName} {assign.userId.lastName}
-                                        </li>
-                                    ))
-                                ) : (
-                                    <li className="text-lg text-gray-500">No assigned users</li>
-                                )}
-                            </ul>
-                        </div>
-                        <button
-                            className="mt-6 w-full py-2 bg-red-500 text-white font-semibold rounded-md hover:bg-red-600 transition duration-300"
-                            onClick={() => setIsAssignedByModalOpen(false)}
-                        >
-                            Close
-                        </button>
-                    </div>
-                </div>
+{isAssignedByModalOpen && (
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50">
+        <div className="bg-white p-6 rounded shadow-lg">
+            <h2 className="text-xl mb-4">Assigned Users</h2>
+            {selectedAssignedBy.length > 0 ? (
+                <ul>
+                    {selectedAssignedBy.map((assignment, index) => (
+                        <li key={index} className="mb-2">
+                            <p>
+                                {assignment.userId ? `${assignment.user.firstName} ${assignment.user.lastName}` : "Unassigned User"}
+                            </p>
+                        </li>
+                    ))}
+                </ul>
+            ) : (
+                <p>No users assigned to this commission.</p>
             )}
+            <button 
+                className="mt-4 bg-gray-500 text-white py-2 px-4 rounded"
+                onClick={() => setIsAssignedByModalOpen(false)}
+            >
+                Close
+            </button>
+        </div>
+    </div>
+)}
             <EmployeeAddedSalesCommissions />
             <EmployeeSalesCommissionsStatus/>
         </div>

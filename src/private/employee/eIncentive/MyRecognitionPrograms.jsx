@@ -4,6 +4,11 @@ import Header from "../../../components/Header";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+const RECOGNITION_PROGRAM_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/recognitionProgram" 
+: "https://backend-hr3.jjm-manufacturing.com/api/recognitionProgram";
+
+
 function MyRecognitionPrograms() {
   const [myRecognitions, setMyRecognitionsPrograms] = useState([]);
 
@@ -18,7 +23,7 @@ function MyRecognitionPrograms() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:7687/api/recognitionProgram/get-my-recognition-programs",
+        `${RECOGNITION_PROGRAM_URL}/get-my-recognition-programs`,
         {
           headers: {
             "Content-Type": "application/json",

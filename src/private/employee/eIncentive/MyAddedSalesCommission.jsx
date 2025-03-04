@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useOutletContext } from "react-router-dom";
 
+const SALES_COMMISSION_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/salesCommission" 
+: "https://backend-hr3.jjm-manufacturing.com/api/salesCommission";
+
 function MyAddedSalesCommission() {
     const { user } = useOutletContext();
     const [myAddedSales, setMyAddedSales] = useState([]);
@@ -17,7 +21,7 @@ function MyAddedSalesCommission() {
     const fetchMyAddedSalesCommissions = async () => {
         try {
             const response = await axios.get(
-                "http://localhost:7687/api/salesCommission/get-my-added-sales-commissions",
+               `${SALES_COMMISSION_URL}/get-my-added-sales-commissions`,
                 { withCredentials: true }
             );
             setMyAddedSales(response.data.myAddedSales || []);

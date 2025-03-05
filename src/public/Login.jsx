@@ -22,35 +22,40 @@ function Login() {
   });
   const navigate = useNavigate();
 
-  // State for password visibility
+
   const [showPassword, setShowPassword] = useState(false);
 
-  // Handle input changes
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
     try {
-      const response = await axios.post(`${AUTH_URL}/testLog`, formData, {
+      const response = await axios.post(`${AUTH_URL}/login`, formData, {
         withCredentials: true,
       });
   
       if (response.status === 200) {
-        toast.success("Login successful!", { autoClose: 2000 });
-  
-        const { redirectUrl } = response.data;
-  
-        if (redirectUrl) {
-          window.location.href = redirectUrl; // Redirect to the respective HR module
-        } else {
-          navigate("/dashboard"); // Default navigation if no redirect URL is provided
-        }
+        toast.success(response.data.message);
+        console.log("Login Successful:", response.data);
+        navigate("/admin-dashboard");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Login failed!", { autoClose: 2000 });
+      if (error.response) {
+        // May response galing sa backend
+        if (error.response.status === 400) {
+          toast.error(error.response.data.message);
+        } else if (error.response.status === 500) {
+          toast.error("Internal Server Error. Please try again later.");
+        } else {
+          toast.error("Login failed. Please try again.");
+        }
+      } else {
+        // Walang response (network error, backend down, etc.)
+        toast.error("Network error. Please check your connection.");
+      }
     }
   };
   

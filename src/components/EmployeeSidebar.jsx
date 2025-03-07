@@ -28,26 +28,26 @@ const EmployeeSidebar = () => {
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     {
       name: "Benefits Overview",
-      href: "/benefits-overview",
       icon: PlusIcon,
       subItems: [
+        { name: "Benefits Overview", href: "/e-benefits-overview" },
         { name: "Apply benefit", href: "/apply-benefit" },
         { name: "My Deductions", href: "/my-deductions" },
       ],
     },
     {
       name: "Incentives Overview",
-      href: "/incentives-overview",
       icon: GiftIcon,
       subItems: [
-        { name: "My sales", href: "/my-sales-commission" },
+        { name: "My Incentives", href: "/e-incentives-overview" },
+        // { name: "My sales", href: "/my-sales-commission" },
         { name: "My tracking", href: "/my-incentives-tracking" },
         { name: "Recognition", href: "/my-recognition-programs" },
       ],
     },
     {
       name: "Compensation Overview",
-      href: "/compensation-overview",
+      href: "/e-compensation-overview",
       icon: DollarSign,
       subItems: [
         { name: "Penalties Overview", href: "/penalties-overview" },

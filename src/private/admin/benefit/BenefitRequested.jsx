@@ -34,7 +34,7 @@ function ApplyBenefit() {
         setUpdatedRequestBenefit([]);
       }
     } catch (error) {
-      toast.error(
+      console.log(
         "Error fetching benefit requests: " +
           (error.response ? error.response.data.message : error.message)
       );

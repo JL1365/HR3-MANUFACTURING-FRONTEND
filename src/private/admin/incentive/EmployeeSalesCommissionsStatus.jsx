@@ -68,7 +68,7 @@ function EmployeeSalesCommissionsStatus() {
                             currentSalesCommissions.map((commission) => (
                                 <tr key={commission._id} className="border-t">
                                     <td className="px-6 py-4 border">
-                                        {commission.userId?.firstName} {commission.userId?.lastName}
+                                        {commission.user?.firstName} {commission.user?.lastName}
                                     </td>
                                     <td className="px-6 py-4 border">{commission.salesStatus || "N/A"}</td>
                                     <td className="px-6 py-4 border">{commission.totalSales || "N/A"}</td>

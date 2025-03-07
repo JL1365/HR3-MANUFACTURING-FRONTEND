@@ -44,6 +44,8 @@ import EmployeeSalaryDistributionRequests from "./private/admin/payroll/Employee
 import EmployeeBenefitDetails from "./private/admin/benefit/EmployeeBenefitsDetails";
 import SendDocuments from "./private/admin/benefit/SendDocuments";
 import PayrollOverview from "./private/admin/payroll/PayrollOverview";
+import Grievance from "./private/admin/compensation/Grievance";
+import SalaryComputation from "./private/admin/payroll/SalaryComputation";
 
 function App() {
   return (
@@ -53,7 +55,7 @@ function App() {
         <Route  path="*" element={<NotFound/>}/>
       </Route>
 
-      <Route element={<ProtectedRoute allowedHr={[3]} />}>
+      <Route element={<ProtectedRoute allowedHr={[1,2,3,4]} />}>
         <Route
           path="/dashboard"
           element={
@@ -73,7 +75,7 @@ function App() {
         }
       />
         <Route
-          path="/benefits-management"
+          path="/benefits-overview"
           element={
             <LayoutWithSidebar>
               <BenefitsManagement />
@@ -114,7 +116,7 @@ function App() {
         />
         {/* Incentives */}
         <Route
-          path="/incentives-management"
+          path="/incentives-overview"
           element={
             <LayoutWithSidebar>
               <IncentivesManagement />
@@ -130,14 +132,14 @@ function App() {
           }
         />
 
-          <Route
+          {/* <Route
           path="/sales-commission"
           element={
             <LayoutWithSidebar>
               <SalesCommission />
             </LayoutWithSidebar>
           }
-        />
+        /> */}
 
           <Route
           path="/recognition-programs"
@@ -149,14 +151,21 @@ function App() {
         />
 
           <Route
-          path="/compensation-planning"
+          path="/compensation-overview"
           element={
             <LayoutWithSidebar>
               <CompensationPlanning />
             </LayoutWithSidebar>
           }
         />
-
+                <Route
+          path="/grievance"
+          element={
+            <LayoutWithSidebar>
+              <Grievance />
+            </LayoutWithSidebar>
+          }
+        />
           <Route
           path="/penalty-level"
           element={
@@ -166,6 +175,24 @@ function App() {
           }
         />
         {/* PAYROLL */}
+        <Route
+          path="/payroll-overview"
+          element={
+            <LayoutWithSidebar>
+              <PayrollOverview/>
+            </LayoutWithSidebar>
+          }
+        />
+
+        <Route
+          path="/salary-computation"
+          element={
+            <LayoutWithSidebar>
+              <SalaryComputation/>
+            </LayoutWithSidebar>
+          }
+        />
+
           <Route
           path="/request-budget"
           element={
@@ -179,14 +206,6 @@ function App() {
           element={
             <LayoutWithSidebar>
               <EmployeeSalaryDistributionRequests />
-            </LayoutWithSidebar>
-          }
-        />
-          <Route
-          path="/payroll-overview"
-          element={
-            <LayoutWithSidebar>
-              <PayrollOverview/>
             </LayoutWithSidebar>
           }
         />
@@ -204,7 +223,7 @@ function App() {
         }
       />
           <Route
-          path="/benefits-overview"
+          path="/e-benefits-overview"
           element={
             <LayoutWithSidebar>
               <BenefitOverview />
@@ -229,7 +248,7 @@ function App() {
         />
         {/* Incentives */}
         <Route
-          path="/incentives-overview"
+          path="/e-incentives-overview"
           element={
             <LayoutWithSidebar>
               <IncentivesOverview />
@@ -245,7 +264,7 @@ function App() {
             </LayoutWithSidebar>
           }
         />
-
+{/* 
         <Route
           path="/my-sales-commission"
           element={
@@ -253,7 +272,7 @@ function App() {
               <MySalesCommission />
             </LayoutWithSidebar>
           }
-        />
+        /> */}
         <Route
           path="/my-recognition-programs"
           element={
@@ -264,13 +283,14 @@ function App() {
         />
         {/* Compensation Overview */}
         <Route
-          path="/compensation-overview"
+          path="/e-compensation-overview"
           element={
             <LayoutWithSidebar>
               <CompensationOverview />
             </LayoutWithSidebar>
           }
         />
+
         <Route
           path="/penalties-overview"
           element={

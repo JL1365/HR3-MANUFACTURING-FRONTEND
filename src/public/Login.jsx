@@ -33,14 +33,14 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${AUTH_URL}/login`, formData, {
+      const response = await axios.post(`${AUTH_URL}/testLog`, formData, {
         withCredentials: true,
       });
   
       if (response.status === 200) {
         toast.success(response.data.message);
         console.log("Login Successful:", response.data);
-        navigate("/admin-dashboard");
+        navigate("/dashboard");
       }
     } catch (error) {
       if (error.response) {

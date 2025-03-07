@@ -71,7 +71,7 @@ function EmployeeAddedSalesCommissions() {
                         {currentSalesCommissions.length > 0 ? (
                             currentSalesCommissions.map((commission) => (
                                 <tr key={commission._id}>
-                                    <td className="px-6 py-4">{commission.userId?.firstName} {commission.userId?.lastName}</td>
+                                    <td className="px-6 py-4">{commission.user?.firstName} {commission.user?.lastName}</td>
                                     <td className="px-6 py-4">{commission.salesCommissionId?.salesCommissionName}</td>
 
                                     <td className="px-6 py-4">

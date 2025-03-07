@@ -28,9 +28,9 @@ const AdminSidebar = () => {
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     {
       name: "Benefits Management",
-      href: "/benefits-management",
       icon: PlusIcon,
       subItems: [
+        { name: "Benefits Overview", href: "/benefits-overview" },
         { name: "Applied request", href: "/applied-request" },
         { name: "Deductions", href: "/deduction-management"},
         { name: "Employee Benefit Details", href: "/employee-benefit-details"},
@@ -39,20 +39,20 @@ const AdminSidebar = () => {
     },
     {
       name: "Incentives Management",
-      href: "/incentives-management",
       icon: GiftIcon,
       subItems: [
-        { name: "Sales commission", href: "/sales-commission"},
+        { name: "Incentives Overview", href: "/incentives-overview"},
+        // { name: "Sales commission", href: "/sales-commission"},
         { name: "Incentive Tracking", href: "/incentive-tracking"},
         { name: "Recognition Programs", href: "/recognition-programs"},
       ],
     },
     {
       name: "Compensation Planning",
-      href: "/compensation-planning",
       icon: Briefcase,
       subItems: [
-        { name: "Grievance Request", href: "/grievance-request"},
+        { name: "Compensation Overview", href: "/compensation-overview"},
+        { name: "Grievance", href: "/grievance"},
         { name: "Penalty Level", href: "/penalty-level"},
       ],
     },
@@ -60,6 +60,7 @@ const AdminSidebar = () => {
       name: "Payroll Processing",
       icon: DollarSign,
       subItems: [
+        { name: "Payroll overview", href: "/payroll-overview" },
         { name: "Salary computation", href: "/salary-computation" },
         { name: "Request a Budget", href: "/request-budget"},
         { name: "Payroll Distribution Requests", href: "/employee-salary-distribution-requests"},

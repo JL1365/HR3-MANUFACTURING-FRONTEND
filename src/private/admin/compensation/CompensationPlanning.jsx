@@ -340,7 +340,7 @@ function CompensationPlanning() {
                   disabled={isEditing}
                 >
                   <option value="">Select Position</option>
-                  {positions.map((pos, index) => (
+                  {(positions ?? []).map((pos, index) => (
                     <option key={index} value={pos}>
                       {pos}
                     </option>

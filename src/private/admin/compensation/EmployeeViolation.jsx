@@ -273,8 +273,8 @@ function EmployeeViolation() {
                     className="hover:bg-gray-300 hover:text-white"
                   >
                     <td>
-                      {violation.userId?.firstName || "Unknown"}{" "}
-                      {violation.userId?.lastName || ""}
+                      {violation.user?.firstName || "Unknown"}{" "}
+                      {violation.user?.lastName || ""}
                     </td>
 
                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">

@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "../../../components/Header";
+
 const PayrollOverview = () => {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 5;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,50 +32,81 @@ const PayrollOverview = () => {
     fetchData();
   }, []);
 
+  // Pagination logic
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = data.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(data.length / recordsPerPage);
+
   return (
-    <div>
+    <div className="p-4">
       <Header title="Payroll Overview" />
-      {error && <p style={{ color: "red" }}>Error: {error}</p>}
+      {error && <p className="text-red-500">Error: {error}</p>}
       {data.length === 0 ? (
         <p>Loading...</p>
       ) : (
-        <table border="1" cellPadding="5" style={{ borderCollapse: "collapse", width: "100%" }}>
-          <thead>
-            <tr>
-              <th>Employee ID</th>
-              <th>Username</th>
-              <th>Time In</th>
-              <th>Time Out</th>
-              <th>Total Hours</th>
-              <th>Overtime Hours</th>
-              <th>Status</th>
-              <th>Remarks</th>
-              <th>Entry Status</th>
-              <th>Minutes Late</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item) => (
-              <tr key={item._id}>
-                <td>{item.employee_id}</td>
-                <td>{item.employee_username}</td>
-                <td>{new Date(item.time_in).toLocaleString()}</td>
-                <td>{new Date(item.time_out).toLocaleString()}</td>
-                <td>{item.total_hours}</td>
-                <td>{item.overtime_hours}</td>
-                <td style={{ color: item.status === "approved" ? "green" : "red" }}>
-                  {item.status}
-                </td>
-                <td>{item.remarks || "N/A"}</td>
-                <td style={{ color: item.entry_status === "late" ? "orange" : "black" }}>
-                  {item.entry_status}
-                </td>
-                <td>{item.minutes_late} min</td>
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-300 shadow-md">
+            <thead className="bg-gray-50">
+              <tr className="text-left text-gray-700">
+                <th className="px-4 py-2 border">Firstname</th>
+                <th className="px-4 py-2 border">Lastname</th>
+                <th className="px-4 py-2 border">Time In</th>
+                <th className="px-4 py-2 border">Time Out</th>
+                <th className="px-4 py-2 border">Total Hours</th>
+                <th className="px-4 py-2 border">Overtime Hours</th>
+                <th className="px-4 py-2 border">Status</th>
+                <th className="px-4 py-2 border">Remarks</th>
+                <th className="px-4 py-2 border">Entry Status</th>
+                <th className="px-4 py-2 border">Minutes Late</th>
+                <th className="px-4 py-2 border">Position</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {currentRecords.map((item) => (
+                <tr key={item._id} className="border">
+                  <td className="px-4 py-2 border">{item.employee_firstname}</td>
+                  <td className="px-4 py-2 border">{item.employee_lastname}</td>
+                  <td className="px-4 py-2 border">{new Date(item.time_in).toLocaleString()}</td>
+                  <td className="px-4 py-2 border">{new Date(item.time_out).toLocaleString()}</td>
+                  <td className="px-4 py-2 border">{item.total_hours}</td>
+                  <td className="px-4 py-2 border">{item.overtime_hours}</td>
+                  <td className="px-4 py-2 border text-green-600">{item.status}</td>
+                  <td className="px-4 py-2 border">{item.remarks || "N/A"}</td>
+                  <td className={`px-4 py-2 border ${item.entry_status === "late" ? "text-orange-600" : "text-black"}`}>{item.entry_status}</td>
+                  <td className="px-4 py-2 border">{item.minutes_late} min</td>
+                  <td className="px-4 py-2 border">{item.position}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
+
+      {/* Pagination Controls */}
+      <div className="flex justify-center items-center mt-4 space-x-4">
+        <button
+          className={`px-4 py-2 border rounded ${
+            currentPage === 1 ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white"
+          }`}
+          onClick={() => setCurrentPage(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        <span className="text-gray-700">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          className={`px-4 py-2 border rounded ${
+            currentPage === totalPages ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white"
+          }`}
+          onClick={() => setCurrentPage(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };

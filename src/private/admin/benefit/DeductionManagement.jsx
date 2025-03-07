@@ -12,6 +12,10 @@ const DEDUCTIONS_URL = process.env.NODE_ENV === "development"
   ? "http://localhost:7687/api/benefitRequest" 
   : "https://backend-hr3.jjm-manufacturing.com/api/benefitRequest";
 
+  const COMPENSATION_URL = process.env.NODE_ENV === "development" 
+  ? "http://localhost:7687/api/compensation" 
+  : "https://backend-hr3.jjm-manufacturing.com/api/compensation";
+
 
 function DeductionManagement() {
   const [updatedRequestBenefit, setUpdatedRequestBenefit] = useState([]);
@@ -28,7 +32,9 @@ function DeductionManagement() {
   const [newAmount, setNewAmount] = useState("");
   const [modalPage, setModalPage] = useState(1);
   const modalItemsPerPage = 5;
-
+  const [benefitsData, setBenefitsData] = useState([]);
+  const [selectedPosition, setSelectedPosition] = useState(""); 
+  const [selectedBenefits, setSelectedBenefits] = useState([]); 
   useEffect(() => {
     fetchAllAppliedRequests();
     fetchAllDeductions();
@@ -47,10 +53,10 @@ function DeductionManagement() {
       if (response.data.updatedRequestBenefit) {
         setUpdatedRequestBenefit(response.data.updatedRequestBenefit);
       } else {
-        toast.warn("No benefit requests found.");
+        console.log("No benefit requests found.");
       }
     } catch (error) {
-      toast.error("Error fetching benefit requests.");
+      console.log("Error fetching benefit requests.");
     }
   };
 
@@ -60,7 +66,7 @@ function DeductionManagement() {
         `${DEDUCTIONS_URL}/get-all-deductions`,
         { withCredentials: true }
       );
-      console.log("Fetched Deductions: ", response.data); // Check full response
+      console.log("Fetched Deductions: ", response.data);
       
       if (response.data.deductions && response.data.deductions.length > 0) {
         console.log("First deduction structure:", response.data.deductions[0]);
@@ -68,13 +74,39 @@ function DeductionManagement() {
         groupDeductions(response.data.deductions);
       } else {
         console.warn("No deductions found or empty array returned");
-        toast.warn("No deductions found.");
       }
     } catch (error) {
-      toast.error("Error fetching deductions.");
-      console.error("Error details:", error); // Log full error
+      console.error("Error details:", error); 
     }
   };
+
+  useEffect(() => {
+    const fetchBenefitsAndDeductions = async () => {
+        try {
+            const response = await axios.get(`${COMPENSATION_URL}/get-benefits-and-deductions`);
+            if (response.data.success) {
+                setBenefitsData(response.data.data);
+            } else {
+                throw new Error(response.data.message);
+            }
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    fetchBenefitsAndDeductions();
+}, []);
+
+const handleSelectChange = (event) => {
+  const position = event.target.value;
+  setSelectedPosition(position);
+
+  // Hanapin ang benefits ng napiling position
+  const selected = benefitsData.find((plan) => plan.positionName === position);
+  setSelectedBenefits(selected ? selected.benefits : []);
+};
 
 const groupDeductions = (deductions) => {
   const grouped = deductions.reduce((acc, deduction) => {
@@ -205,74 +237,116 @@ const groupDeductions = (deductions) => {
       </button>
 
       {isOpenModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50">
-          <div className="bg-white p-6 rounded shadow-lg">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <select
-                value={selectedUser}
-                onChange={(e) => setSelectedUser(e.target.value)}
-                className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider w-full"
-              >
-                <option value="">Select User</option>
-                {[
-                  ...new Set(updatedRequestBenefit.map((req) => req.userId)),
-                ].map((userId) => {
-                  const user = updatedRequestBenefit.find(
-                    (req) => req.userId === userId
-                  )?.user;
+  <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50">
+    <div className="bg-white p-6 rounded shadow-lg max-w-lg w-full">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Dropdowns in One Line */}
+        <div className="flex gap-4">
+          <select
+            value={selectedUser}
+            onChange={(e) => setSelectedUser(e.target.value)}
+            className="px-4 py-2 text-xs font-semibold text-neutral uppercase tracking-wider w-full border rounded"
+          >
+            <option value="">Select User</option>
+            {[
+              ...new Set(updatedRequestBenefit.map((req) => req.userId)),
+            ].map((userId) => {
+              const user = updatedRequestBenefit.find(
+                (req) => req.userId === userId
+              )?.user;
 
-                  return (
-                    <option key={userId} value={userId}>
-                      {user?.firstName && user?.lastName
-                        ? `${user.firstName} ${user.lastName}`
-                        : "Unknown User"}
-                    </option>
-                  );
-                })}
-              </select>
+              return (
+                <option key={userId} value={userId}>
+                  {user?.firstName && user?.lastName
+                    ? `${user.firstName} ${user.lastName} ${user.position}`
+                    : "Unknown User"}
+                </option>
+              );
+            })}
+          </select>
 
-              <select
-                value={selectedBenefit}
-                onChange={(e) => setSelectedBenefit(e.target.value)}
-                className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider w-full"
-                disabled={!selectedUser} // Disabled until a user is selected
-              >
-                <option value="">Select Benefit</option>
-                {updatedRequestBenefit
-                  .filter((req) => req.userId === selectedUser) // Show only benefits requested by selected user
-                  .map((req) => (
-                    <option key={req.benefitId._id} value={req.benefitId._id}>
-                      {req.benefitId?.benefitName || "Unknown Benefit"}
-                    </option>
-                  ))}
-              </select>
+          <select
+            value={selectedBenefit}
+            onChange={(e) => setSelectedBenefit(e.target.value)}
+            className="px-4 py-2 text-xs font-semibold text-neutral uppercase tracking-wider w-full border rounded"
+            disabled={!selectedUser}
+          >
+            <option value="">Select Benefit</option>
+            {updatedRequestBenefit
+              .filter((req) => req.userId === selectedUser)
+              .map((req) => (
+                <option key={req.benefitId._id} value={req.benefitId._id}>
+                  {req.benefitId?.benefitName || "Unknown Benefit"}
+                </option>
+              ))}
+          </select>
 
-              <input
-                type="number"
-                placeholder="Enter Deduction Amount"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider w-full"
-                disabled={!selectedBenefit}
-              />
-
-              <button
-                type="submit"
-                className="mt-4 px-4 py-2 bg-green-500 text-white rounded"
-              >
-                Add Deduction
-              </button>
-              <button
-                type="button"
-                onClick={() => setisOpenModal(false)}
-                className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
-              >
-                Cancel
-              </button>
-            </form>
-          </div>
+          <select
+            onChange={handleSelectChange}
+            value={selectedPosition}
+            className="px-4 py-2 text-xs font-semibold text-neutral uppercase tracking-wider w-full border rounded"
+          >
+            <option value="">-- Select Position --</option>
+            {benefitsData.map((plan, index) => (
+              <option key={index} value={plan.positionName}>
+                {plan.positionName}
+              </option>
+            ))}
+          </select>
         </div>
-      )}
+
+        {/* Display Benefits Based on Selected Position */}
+        {selectedPosition && (
+          <div className="bg-gray-100 p-4 rounded">
+            <h3 className="text-sm font-semibold">
+              Benefits for {selectedPosition}
+            </h3>
+            {selectedBenefits.length > 0 ? (
+              <ul className="list-disc pl-4 text-xs">
+                {selectedBenefits.map((benefit, i) => (
+                  <li key={i}>
+                    {benefit.benefitType.toUpperCase()} - Deduction: ₱
+                    {benefit.deductionsAmount.toLocaleString()}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-xs text-gray-600">No benefits assigned.</p>
+            )}
+          </div>
+        )}
+
+        {/* Input for Deduction Amount */}
+        <input
+          type="number"
+          placeholder="Enter Deduction Amount"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          className="px-4 py-2 text-xs font-semibold text-neutral uppercase tracking-wider w-full border rounded"
+          disabled={!selectedBenefit}
+        />
+
+        {/* Buttons */}
+        <div className="flex justify-end gap-4">
+          <button
+            type="submit"
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+          >
+            Add Deduction
+          </button>
+          <button
+            type="button"
+            onClick={() => setisOpenModal(false)}
+            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+
       {/* Deductions Table */}
       <div className="mt-6">
         <table className="min-w-full divide-y divide-gray-200">

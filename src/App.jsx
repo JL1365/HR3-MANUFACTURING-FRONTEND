@@ -18,7 +18,6 @@ import DeductionManagement from "./private/admin/benefit/DeductionManagement";
 
 import IncentivesManagement from "./private/admin/incentive/IncentivesManagement";
 import IncentiveTracking from "./private/admin/incentive/IncentiveTracking";
-import SalesCommission from "./private/admin/incentive/SalesCommission";
 import RecognitionPrograms from "./private/admin/incentive/RecognitionPrograms";
 import CompensationPlanning from "./private/admin/compensation/CompensationPlanning";
 
@@ -33,7 +32,6 @@ import PenaltyLevel from "./private/admin/compensation/PenaltyLevel";
 import IncentivesOverview from "./private/employee/eIncentive/IncentivesOverview";
 import MyIncentivesTracking from "./private/employee/eIncentive/MyIncentiveTracking";
 import Profile from "./components/Profile";
-import MySalesCommission from "./private/employee/eIncentive/MySalesCommission";
 import MyRecognitionPrograms from "./private/employee/eIncentive/MyRecognitionPrograms";
 
 import CompensationOverview from "./private/employee/ecompensation/CompensationOverview";

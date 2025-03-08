@@ -2,6 +2,12 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "../../../components/Header";
 
+const INTEGRATION_URL =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:7687/api/integration"
+    : "https://backend-hr3.jjm-manufacturing.com/api/integration";
+
+
 const PayrollOverview = () => {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
@@ -13,7 +19,7 @@ const PayrollOverview = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          "http://localhost:7687/api/integration/get-all-attendance-data",
+          `${INTEGRATION_URL}/get-all-attendance-data`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

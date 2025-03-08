@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Header from '../../../components/Header'
+import PayrollHistory from "./PayrollHistory";
 
 const SALARY_REQUEST_URL =
   process.env.NODE_ENV === "development"
@@ -35,13 +37,22 @@ const SalaryComputation = () => {
   }, []);
 
   const finalizePayroll = async (batchId) => {
+   
+    const isConfirmed = window.confirm(
+      "Are you sure you want to finalize the payroll?"
+    );
+    
+    if (!isConfirmed) {
+      return; 
+    }
+  
     try {
       setIsFinalizing(true);
       const response = await axios.post(
         `${SALARY_REQUEST_URL}/finalize-payroll`,
         { batch_id: batchId }
       );
-
+  
       toast.success(response.data.message);
       setPayrollData(payrollData.filter((batch) => batch.batch_id !== batchId));
     } catch (error) {
@@ -52,6 +63,101 @@ const SalaryComputation = () => {
     } finally {
       setIsFinalizing(false);
     }
+  };
+  
+
+  const printPDF = () => {
+    const printWindow = window.open("", "", "height=600,width=800");
+
+    const generateEmployeeRows = (batch) => {
+      return batch.employees
+        .map((employee) => {
+          return `
+            <tr>
+              <td>${employee.employee_id}</td>
+              <td>${employee.employee_firstname} ${employee.employee_lastname}</td>
+              <td>${employee.position}</td>
+              <td>${employee.totalWorkHours.toFixed(2)} hrs</td>
+              <td>${employee.totalOvertimeHours.toFixed(2)} hrs</td>
+              <td>₱${employee.hourlyRate.toFixed(2)}</td>
+              <td>₱${employee.overtimeRate.toFixed(2)}</td>
+              <td>₱${parseFloat(employee.salary).toFixed(2)}</td>
+              <td>₱${employee.benefitsDeductionsAmount.toFixed(2)}</td>
+              <td>₱${employee.incentiveAmount.toFixed(2)}</td>
+              <td><strong>₱${employee.adjustedSalary}</strong></td>
+            </tr>
+          `;
+        })
+        .join('');
+    };
+
+    const batchesToPrint = payrollData;
+
+    const printContent = batchesToPrint.map((batch) => {
+      return `
+        <div>
+          <h3>Batch ID: ${batch.batch_id}</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Employee ID</th>
+                <th>Name</th>
+                <th>Position</th>
+                <th>Total Work Hours</th>
+                <th>Overtime Hours</th>
+                <th>Hourly Rate</th>
+                <th>Overtime Rate</th>
+                <th>Salary</th>
+                <th>Deductions</th>
+                <th>Incentives</th>
+                <th>Adjusted Salary</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${generateEmployeeRows(batch)}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }).join('');
+
+    printWindow.document.write(`
+      <html>
+      <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+          }
+          th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+          }
+          th {
+            background-color: #f2f2f2;
+          }
+          .page-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="content-wrapper">
+          <div class="page-title">Salary Computation</div>
+          ${printContent}
+        </div>
+      </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.print();
   };
 
   // Pagination Logic
@@ -76,9 +182,23 @@ const SalaryComputation = () => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <h2 className="text-3xl font-bold text-center mb-6">
-        Salary Computation
-      </h2>
+        <Header title="Salary Computation"/>
+
+      <div className="flex justify-between mb-4">
+        <button
+          onClick={printPDF}
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700"
+        >
+          Download as PDF
+        </button>
+        <button
+          onClick={() => finalizePayroll(currentItems[0]?.batch_id)}
+          className="btn btn-primary"
+          disabled={isFinalizing}
+        >
+          {isFinalizing ? "Finalizing..." : "Finalize Payroll"}
+        </button>
+      </div>
 
       {payrollData.length === 0 ? (
         <div className="text-center text-gray-500 text-lg">
@@ -133,17 +253,6 @@ const SalaryComputation = () => {
                 </tbody>
               </table>
             </div>
-
-            {/* Finalize Payroll Button */}
-            <div className="flex justify-end mt-4">
-              <button
-                onClick={() => finalizePayroll(batch.batch_id)}
-                className="btn btn-primary"
-                disabled={isFinalizing}
-              >
-                {isFinalizing ? "Finalizing..." : "Finalize Payroll"}
-              </button>
-            </div>
           </div>
         ))
       )}
@@ -170,6 +279,7 @@ const SalaryComputation = () => {
           </button>
         </div>
       )}
+      <PayrollHistory />
     </div>
   );
 };

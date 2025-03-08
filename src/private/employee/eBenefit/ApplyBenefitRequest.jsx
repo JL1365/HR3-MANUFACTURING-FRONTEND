@@ -69,7 +69,11 @@ function ApplyBenefit() {
         }
       );
       console.log("Benefits response:", response.data);
-      setAllBenefits(response.data.allBenefits);
+      const filteredBenefits = response.data.allBenefits.filter(
+        (benefit) => benefit.isNeedRequest !== false
+      );
+  
+      setAllBenefits(filteredBenefits);
     } catch (error) {
       console.error("Error fetching benefits:", error);
       toast.error(

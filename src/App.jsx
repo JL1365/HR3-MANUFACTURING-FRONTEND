@@ -210,7 +210,7 @@ function App() {
         />
 
           <Route
-          path="/behavioural"
+          path="/behavioural-analytics"
           element={
             <LayoutWithSidebar>
               <BehavioralAnalytics />

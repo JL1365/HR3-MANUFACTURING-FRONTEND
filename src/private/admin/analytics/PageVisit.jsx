@@ -103,7 +103,6 @@ function PageVisit() {
                 currentVisits.map(([userId, visits]) => (
                   <tr key={userId} className="hover:bg-gray-300 hover:text-white">
                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">{userId || "Unknown"}</td>
-                    <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">{userId || "Unknown"}</td>
                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">{visits.length}</td>
                     <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
                       <button onClick={() => handleViewDetails(visits)} className="btn btn-primary">View Details</button>

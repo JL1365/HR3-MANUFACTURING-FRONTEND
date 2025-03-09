@@ -3,8 +3,10 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "../../../components/Header";
+import usePageTracking from "../../../hooks/usePageTracking";
 
 function MyDeductions() {
+  usePageTracking("Employee Deductions");
   const [myDeductions, setMyDeductions] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedBenefit, setSelectedBenefit] = useState(null);
@@ -12,6 +14,7 @@ function MyDeductions() {
   const [modalPage, setModalPage] = useState(1);
   const itemsPerPage = 10;
   const modalItemsPerPage = 5;
+ 
 
   useEffect(() => {
     fetchMyDeductions();

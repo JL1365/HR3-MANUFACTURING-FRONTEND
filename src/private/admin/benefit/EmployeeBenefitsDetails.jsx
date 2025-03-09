@@ -6,7 +6,6 @@ const BENEFIT_URL = process.env.NODE_ENV === "development"
   ? "http://localhost:7687/api/benefit" 
   : "https://backend-hr3.jjm-manufacturing.com/api/benefit";
 
-
 function EmployeeBenefitsDetails() {
   const [employeeBenefits, setEmployeeBenefits] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);

@@ -27,7 +27,7 @@ const EmployeeSidebar = () => {
   const menuItems = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     {
-      name: "Benefits Overview",
+      name: "Benefits",
       icon: PlusIcon,
       subItems: [
         { name: "Benefits Overview", href: "/e-benefits-overview" },
@@ -36,10 +36,10 @@ const EmployeeSidebar = () => {
       ],
     },
     {
-      name: "Incentives Overview",
+      name: "Incentives",
       icon: GiftIcon,
       subItems: [
-        { name: "My Incentives", href: "/e-incentives-overview" },
+        { name: "Incentives Overview", href: "/e-incentives-overview" },
         // { name: "My sales", href: "/my-sales-commission" },
         { name: "My tracking", href: "/my-incentives-tracking" },
         { name: "Recognition", href: "/my-recognition-programs" },

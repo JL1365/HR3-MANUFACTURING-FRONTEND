@@ -44,6 +44,7 @@ import SendDocuments from "./private/admin/benefit/SendDocuments";
 import PayrollOverview from "./private/admin/payroll/PayrollOverview";
 import Grievance from "./private/admin/compensation/Grievance";
 import SalaryComputation from "./private/admin/payroll/SalaryComputation";
+import BehavioralAnalytics from "./private/admin/analytics/BehaviouralAnalytics";
 
 function App() {
   return (
@@ -204,6 +205,15 @@ function App() {
           element={
             <LayoutWithSidebar>
               <EmployeeSalaryDistributionRequests />
+            </LayoutWithSidebar>
+          }
+        />
+
+          <Route
+          path="/behavioural"
+          element={
+            <LayoutWithSidebar>
+              <BehavioralAnalytics />
             </LayoutWithSidebar>
           }
         />

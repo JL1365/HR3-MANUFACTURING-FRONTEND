@@ -3,6 +3,7 @@ import axios from "axios";
 import Header from "../../../components/Header";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import usePageTracking from "../../../hooks/usePageTracking";
 
 const TRACKING_URL = process.env.NODE_ENV === "development" 
 ? "http://localhost:7687/api/incentiveTracking" 
@@ -10,6 +11,7 @@ const TRACKING_URL = process.env.NODE_ENV === "development"
 
 
 function MyIncentivesTracking() {
+     usePageTracking("Employee Incentives Tracking");
     const [myIncentivesTracking, setMyIncentivesTracking] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;

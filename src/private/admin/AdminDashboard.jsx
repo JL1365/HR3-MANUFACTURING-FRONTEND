@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../../components/Header";
 
+const BENEFIT_REQUEST_URL = process.env.NODE_ENV === "development" 
+? "http://localhost:7687/api/benefitRequest" 
+: "https://backend-hr3.jjm-manufacturing.com/api/benefitRequest";
+
 function AdminDashboard() {
     const [appliedRequestCount, setAppliedRequestCount] = useState(0);
     const [newRequestCount, setNewRequestCount] = useState(0);
@@ -12,7 +16,7 @@ function AdminDashboard() {
 
     useEffect(() => {
         // Fetch applied requests count
-        axios.get("http://localhost:7687/api/benefitRequest/get-all-applied-requests-count")
+        axios.get(`${BENEFIT_REQUEST_URL}/get-all-applied-requests-count`)
             .then(response => {
                 setAppliedRequestCount(response.data.totalAppliedRequests);
                 setNewRequestCount(response.data.newRequestsCount);

@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const API_URL = "http://localhost:7687/api/auth";
+const AUTH_URL =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:7687/api/auth"
+    : "https://backend-hr3.jjm-manufacturing.com/api/auth";
 
 function LoginActivity() {
   const [loginActivities, setLoginActivities] = useState([]);
@@ -19,7 +22,7 @@ function LoginActivity() {
 
   const fetchLoginActivities = async () => {
     try {
-      const response = await axios.get(`${API_URL}/get-login-activities`);
+      const response = await axios.get(`${AUTH_URL}/get-login-activities`);
       setLoginActivities(response.data.data);
     } catch (error) {
       console.error("Error fetching login activities:", error);

@@ -2,6 +2,12 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
+const INTEGRATION_URL =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:7687/api/integration"
+    : "https://backend-hr3.jjm-manufacturing.com/api/integration";
+
+
 function EmployeeLeaves() {
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +20,7 @@ function EmployeeLeaves() {
   useEffect(() => {
     const fetchLeaves = async () => {
       try {
-        const response = await axios.get("http://localhost:7687/api/integration/get-employee-leaves-count");
+        const response = await axios.get(`${INTEGRATION_URL}/get-employee-leaves-count`);
         setLeaves(response.data.data);
       } catch (err) {
         setError("Error fetching leaves data");

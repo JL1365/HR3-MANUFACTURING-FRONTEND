@@ -28,6 +28,7 @@ function CompensationPlanning() {
     holidayRate: "",
     allowances: [],
     benefits: [],
+    paidLeaves: [],
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -132,6 +133,7 @@ function CompensationPlanning() {
       holidayRate: compensation.holidayRate,
       allowances: compensation.allowances,
       benefits: compensation.benefits,
+      paidLeaves: compensation.paidLeaves,
     });
     setIsEditing(true);
     setIsOpenModal(true);
@@ -145,6 +147,7 @@ function CompensationPlanning() {
       holidayRate: "",
       allowances: [],
       benefits: [],
+      paidLeaves: [],
     });
     setEditingItem(null);
     setIsEditing(false);
@@ -225,6 +228,9 @@ function CompensationPlanning() {
                 Benefits
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                Paid Leaves
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
                 Action
               </th>
             </tr>
@@ -274,6 +280,20 @@ function CompensationPlanning() {
                       </ul>
                     ) : (
                       "No benefits"
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
+                    {compensation.paidLeaves &&
+                    compensation.paidLeaves.length > 0 ? (
+                      <ul>
+                        {compensation.paidLeaves.map((paidLeave, index) => (
+                          <li key={index}>
+                            {paidLeave.leavesType}: ₱{paidLeave.paidLeavesAmount}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      "No Paid Leaves"
                     )}
                   </td>
                   <td className="px-6 py-4 text-left text-xs font-semibold text-neutral uppercase tracking-wider">
@@ -520,7 +540,7 @@ function CompensationPlanning() {
                   <div>No benefits available</div>
                 )}
 
-                <button
+<button
                   type="button"
                   onClick={() =>
                     setFormData({
@@ -535,6 +555,88 @@ function CompensationPlanning() {
                 >
                   Add Benefits
                 </button>
+
+
+                {/* PAID LEAVES */}
+                {formData.paidLeaves.length > 0 ? (
+                  formData.paidLeaves.map((paidLeave, index) => (
+                    <div key={index} className="flex justify-between mb-4">
+                      <div>
+                        <label>paidLeave Type</label>
+                        <input
+                          type="text"
+                          name={`leavesType${index}`}
+                          value={paidLeave.paidLeaveType}
+                          onChange={(e) => {
+                            const newPaidLeaves = [...formData.paidLeaves];
+                            newPaidLeaves[index].leavesType = e.target.value;
+                            setFormData({
+                              ...formData,
+                              paidLeaves: newPaidLeaves,
+                            });
+                          }}
+                          required
+                          className="border p-2 w-full"
+                        />
+                      </div>
+                      <div>
+                        <label>Amount</label>
+                        <input
+                          type="number"
+                          name={`paidLeavesAmount${index}`}
+                          value={paidLeave.paidLeavesAmount}
+                          onChange={(e) => {
+                            const newPaidLeaves = [...formData.paidLeaves];
+                            newPaidLeaves[index].paidLeavesAmount =
+                              e.target.value;
+                            setFormData({
+                              ...formData,
+                              paidLeaves: newPaidLeaves,
+                            });
+                          }}
+                          required
+                          className="border p-2 w-full"
+                        />
+                      </div>
+                      <div className="flex justify-center items-end">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setFormData({
+                              ...formData,
+                              paidLeaves: formData.paidLeaves.filter(
+                                (_, i) => i !== index
+                              ),
+                            })
+                          }
+                          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition duration-200"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div>No Paid Leaves available</div>
+                )}
+                
+
+<button
+                  type="button"
+                  onClick={() =>
+                    setFormData({
+                      ...formData,
+                      paidLeaves: [
+                        ...formData.paidLeaves,
+                        { leavesType: "", paidLeavesAmount: "" },
+                      ],
+                    })
+                  }
+                  className="px-4 py-2 bg-blue-500 text-white rounded"
+                >
+                  Add Paid Leaves
+                </button>
+
               </div>
               <button
                 type="submit"

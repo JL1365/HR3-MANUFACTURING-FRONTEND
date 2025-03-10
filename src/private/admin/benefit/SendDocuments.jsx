@@ -70,7 +70,7 @@ const SendDocuments = () => {
     formDataObj.append("documentFile", formData.documentFile);
 
     try {
-      await axios.post("http://localhost:7687/api/benefit/send-benefit-documents", formDataObj, {
+      await axios.post(`${BENEFIT_URL}/send-benefit-documents`, formDataObj, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       toast.success("Document sent successfully!");

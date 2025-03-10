@@ -45,6 +45,7 @@ import PayrollOverview from "./private/admin/payroll/PayrollOverview";
 import Grievance from "./private/admin/compensation/Grievance";
 import SalaryComputation from "./private/admin/payroll/SalaryComputation";
 import BehavioralAnalytics from "./private/admin/analytics/BehaviouralAnalytics";
+import SalaryPredictions from "./components/SalaryPredictions";
 
 function App() {
   return (
@@ -214,6 +215,14 @@ function App() {
           element={
             <LayoutWithSidebar>
               <BehavioralAnalytics />
+            </LayoutWithSidebar>
+          }
+        />
+          <Route
+          path="/salary-predictions"
+          element={
+            <LayoutWithSidebar>
+              <SalaryPredictions />
             </LayoutWithSidebar>
           }
         />

@@ -16,6 +16,7 @@ const SalaryComputation = () => {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isFinalizing, setIsFinalizing] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
   const itemsPerPage = 5;
 
   useEffect(() => {
@@ -37,22 +38,21 @@ const SalaryComputation = () => {
   }, []);
 
   const finalizePayroll = async (batchId) => {
-   
     const isConfirmed = window.confirm(
       "Are you sure you want to finalize the payroll?"
     );
-    
+
     if (!isConfirmed) {
-      return; 
+      return;
     }
-  
+
     try {
       setIsFinalizing(true);
       const response = await axios.post(
         `${SALARY_REQUEST_URL}/finalize-payroll`,
         { batch_id: batchId }
       );
-  
+
       toast.success(response.data.message);
       setPayrollData(payrollData.filter((batch) => batch.batch_id !== batchId));
     } catch (error) {
@@ -64,7 +64,6 @@ const SalaryComputation = () => {
       setIsFinalizing(false);
     }
   };
-  
 
   const printPDF = () => {
     const printWindow = window.open("", "", "height=600,width=800");
@@ -81,10 +80,10 @@ const SalaryComputation = () => {
               <td>${employee.totalOvertimeHours.toFixed(2)} hrs</td>
               <td>₱${employee.hourlyRate.toFixed(2)}</td>
               <td>₱${employee.overtimeRate.toFixed(2)}</td>
-              <td>₱${parseFloat(employee.salary).toFixed(2)}</td>
+              <td>₱${parseFloat(employee.grossSalary).toFixed(2)}</td>
               <td>₱${employee.benefitsDeductionsAmount.toFixed(2)}</td>
               <td>₱${employee.incentiveAmount.toFixed(2)}</td>
-              <td><strong>₱${employee.adjustedSalary}</strong></td>
+              <td><strong>₱${employee.netSalary}</strong></td>
             </tr>
           `;
         })
@@ -107,10 +106,10 @@ const SalaryComputation = () => {
                 <th>Overtime Hours</th>
                 <th>Hourly Rate</th>
                 <th>Overtime Rate</th>
-                <th>Salary</th>
+                <th>Gross Salary</th>
                 <th>Deductions</th>
                 <th>Incentives</th>
-                <th>Adjusted Salary</th>
+                <th>Net Salary</th>
               </tr>
             </thead>
             <tbody>
@@ -160,6 +159,14 @@ const SalaryComputation = () => {
     printWindow.print();
   };
 
+  const openModal = (employee) => {
+    setSelectedEmployee(employee);
+  };
+
+  const closeModal = () => {
+    setSelectedEmployee(null);
+  };
+
   // Pagination Logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -182,7 +189,7 @@ const SalaryComputation = () => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-        <Header title="Salary Computation"/>
+      <Header title="Salary Computation" />
 
       <div className="flex justify-between mb-4">
         <button
@@ -220,14 +227,17 @@ const SalaryComputation = () => {
                     <th>Employee ID</th>
                     <th>Name</th>
                     <th>Position</th>
-                    <th>Total Work Hours</th>
-                    <th>Overtime Hours</th>
                     <th>Hourly Rate</th>
+                    <th>Total Work Hours</th>
                     <th>Overtime Rate</th>
-                    <th>Salary</th>
+                    <th>Overtime Hours</th>
+                    <th>Holiday Rate</th>
+                    <th>Total Holiday</th>
+                    <th>Gross Salary</th>
                     <th>Deductions</th>
                     <th>Incentives</th>
-                    <th>Adjusted Salary</th>
+                    <th>Net Salary</th>
+                    <th>Details</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -238,20 +248,35 @@ const SalaryComputation = () => {
                         {employee.employee_firstname} {employee.employee_lastname}
                       </td>
                       <td>{employee.position}</td>
-                      <td>{employee.totalWorkHours.toFixed(2)} hrs</td>
-                      <td>{employee.totalOvertimeHours.toFixed(2)} hrs</td>
                       <td>₱{employee.hourlyRate.toFixed(2)}</td>
+                      <td>{employee.totalWorkHours.toFixed(2)} hrs</td>
                       <td>₱{employee.overtimeRate.toFixed(2)}</td>
-                      <td>₱{parseFloat(employee.salary).toFixed(2)}</td>
+                      <td>{employee.totalOvertimeHours.toFixed(2)} hrs</td>
+                      <td>{employee.holidayRate.toFixed(2)}</td>
+                      <td>{employee.holidayCount}</td>
+                      <td>₱{parseFloat(employee.grossSalary).toFixed(2)}</td>
                       <td>₱{employee.benefitsDeductionsAmount.toFixed(2)}</td>
                       <td>₱{employee.incentiveAmount.toFixed(2)}</td>
                       <td>
-                        <strong>₱{employee.adjustedSalary}</strong>
+                        <strong>₱{employee.netSalary}</strong>
+                      </td>
+                      <td>
+                        <button
+                          onClick={() => openModal(employee)}
+                          className="btn btn-sm btn-info"
+                        >
+                          View Details
+                        </button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              <div className="mt-6 p-4 bg-gray-100 text-lg font-bold text-right">
+                Total Payroll Amount: ₱{payrollData.reduce((batchTotal, batch) => {
+                  return batchTotal + batch.employees.reduce((total, emp) => total + Number(emp.netSalary), 0);
+                }, 0).toFixed(2)}
+              </div>
             </div>
           </div>
         ))
@@ -280,6 +305,43 @@ const SalaryComputation = () => {
         </div>
       )}
       <PayrollHistory />
+
+      {/* Modal for displaying detailed work hours and overtime hours */}
+      {selectedEmployee && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
+            <h2 className="text-xl font-semibold mb-4">Details for {selectedEmployee.employee_firstname} {selectedEmployee.employee_lastname}</h2>
+            <table className="table w-full">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th>Date</th>
+                  <th>Work Hours</th>
+                  <th>Overtime Hours</th>
+                  <th>Holiday</th>
+                </tr>
+              </thead>
+              <tbody>
+                {selectedEmployee.dailyWorkHours.map((workHours, index) => (
+                  <tr key={index}>
+                    <td>{new Date(workHours.date).toLocaleDateString()}</td>
+                    <td>{workHours.hours.toFixed(2)} hrs</td>
+                    <td>{selectedEmployee.dailyOvertimeHours[index].hours.toFixed(2)} hrs</td>
+                    <td>{workHours.isHoliday ? "Yes" : "No"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={closeModal}
+                className="btn btn-secondary"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

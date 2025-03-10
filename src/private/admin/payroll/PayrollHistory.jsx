@@ -98,6 +98,9 @@ function PayrollHistory() {
                 Batch ID: {batch._id}
               </h3>
               <p>Finalized Date: {new Date(batch.payrolls[0]?.payroll_date).toLocaleDateString()}</p>
+              <div className="mt-6 p-4 bg-white text-lg center font-bold text-center">
+                Total Payroll Amount: ₱{batch.payrolls.reduce((total, emp) => total + Number(emp.netSalary), 0).toFixed(2)}
+              </div>
             </div>
           ))}
         </div>
@@ -139,8 +142,8 @@ function PayrollHistory() {
                     <th>Employee Name</th>
                     <th>Position</th>
                     <th>Total Work Hours</th>
-                    <th>Salary</th>
-                    <th>Adjusted Salary</th>
+                    <th>Gross Salary</th>
+                    <th>Net Salary</th>
                     <th>Payroll Date</th>
                   </tr>
                 </thead>
@@ -152,8 +155,8 @@ function PayrollHistory() {
                       </td>
                       <td>{payroll.position}</td>
                       <td>{payroll.totalWorkHours}</td>
-                      <td>₱{parseFloat(payroll.salary).toFixed(2)}</td>
-                      <td>₱{parseFloat(payroll.adjustedSalary).toFixed(2)}</td>
+                      <td>₱{parseFloat(payroll.grossSalary).toFixed(2)}</td>
+                      <td>₱{parseFloat(payroll.netSalary).toFixed(2)}</td>
                       <td>{new Date(payroll.payroll_date).toLocaleDateString()}</td>
                     </tr>
                   ))}
